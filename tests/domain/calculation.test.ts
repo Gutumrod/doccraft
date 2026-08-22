@@ -57,6 +57,27 @@ describe('calculation pipeline', () => {
     expect(totals.netPayable).toBe(297);
   });
 
+  it('applies document discount proportionally to the explicit WHT basis', () => {
+    const document = makeDocument();
+    document.items.push({
+      id: 'line-2',
+      description: 'Second service',
+      quantity: 1,
+      unitPrice: 200,
+      discount: { mode: 'none' },
+    });
+    document.adjustments.documentDiscount = { mode: 'fixed', value: 100 };
+    document.adjustments.wht = { enabled: true, ratePercent: 3, basisLineItemIds: ['line-1'] };
+
+    const totals = expectCalculated(document);
+
+    expect(totals.subtotal).toBe(400);
+    expect(totals.amountAfterDiscount).toBe(300);
+    expect(totals.whtBasisAmount).toBe(150);
+    expect(totals.whtAmount).toBe(4.5);
+    expect(totals.netPayable).toBe(295.5);
+  });
+
   it('allows enabled WHT with a zero explicit basis', () => {
     const document = makeDocument();
     document.adjustments.wht = { enabled: true, ratePercent: 3, basisLineItemIds: [] };
@@ -101,10 +122,10 @@ describe('calculation pipeline', () => {
     expect(totals.documentDiscountAmount).toBe(28);
     expect(totals.amountAfterDiscount).toBe(252);
     expect(totals.vatAmount).toBe(17.64);
-    expect(totals.whtBasisAmount).toBe(180);
-    expect(totals.whtAmount).toBe(5.4);
-    expect(totals.netPayable).toBe(264.24);
-    expect(totals.depositAmount).toBe(66.06);
+    expect(totals.whtBasisAmount).toBe(162);
+    expect(totals.whtAmount).toBe(4.86);
+    expect(totals.netPayable).toBe(264.78);
+    expect(totals.depositAmount).toBe(66.2);
   });
 
   it('does not mutate the input document', () => {
@@ -168,6 +189,7 @@ describe('calculation validation', () => {
 
   it('rejects invalid WHT rate and oversized fixed deposit', () => {
     const invalidRate = makeDocument();
+    invalidRate.adjustments.wht.enabled = true;
     invalidRate.adjustments.wht.ratePercent = Number.NaN;
     expect(calculateDocument(invalidRate).ok).toBe(false);
 

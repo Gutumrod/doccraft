@@ -1,10 +1,10 @@
 # DocCraft — Phase 1 Execution Brief
 
 > **Phase:** 1 — Domain Model + Calculation Engine
-> **Status:** PAUSED — partial implementation exists; resume only after D0 Documentation Gate PASS
+> **Status:** CLOSED — GATE 1 PASS; Phase 2 not opened
 > **Date:** 2026-08-22
-> **Repository root:** `D:\AI-Workspace\projects\saas-product-hub`
-> **Product path:** `products\DocCraft`
+> **Repository root:** `D:\AI-Workspace\projects\saas-product-hub\products\DocCraft`
+> **Remote:** `https://github.com/Gutumrod/doccraft.git`
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 
 ## Objective
@@ -62,6 +62,7 @@ Type contract: TypeScript 5.9.3 strict
 - `tax_invoice` valid เฉพาะ VAT registered + required tax fields ครบ
 - VAT disabled/non-registered state ต้องไม่เกิด VAT charge
 - WHT ต้องคำนวณจาก taxable/service basis ที่ explicit ไม่ใช่ subtotal ทั้งเอกสารโดยอัตโนมัติ
+- document discount ต้องลด WHT basis แบบ proportional allocation ตาม PRD ก่อนคำนวณ WHT
 - rounding policy ต้องอยู่จุดเดียวและถูกเรียกใช้ทุก calculation path
 - pure calculation function ห้าม mutate input
 

@@ -1,9 +1,9 @@
 # DocCraft — Product Engineering Roadmap
 
-> **Status:** Execution Contract — Documentation Freeze
+> **Status:** Execution Contract — D0 Approved Baseline
 > **Version:** 2.0
 > **Rule:** Phase ถัดไปเปิดได้เมื่อ phase ปัจจุบันผ่าน acceptance gate และ review แล้วเท่านั้น
-> **D0 Freeze:** ห้ามแก้ production code เพิ่มจน `DOCUMENTATION_READINESS_INDEX.md` ผ่าน D0 Documentation Gate
+> **D0:** PASS — Phase 1 may proceed under its current execution brief
 > **Execution Detail:** `IMPLEMENTATION_PLAN.md` เป็นแผนปฏิบัติการที่ต้อง map 1:1 กับ Phase 1–9 ของ ROADMAP นี้; งาน Repository Intake เป็น pre-implementation step (`R0`) ไม่ใช่ ROADMAP Phase 0
 
 ## Phase 0 — Documentation Contract

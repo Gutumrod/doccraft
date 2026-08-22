@@ -98,9 +98,12 @@ export function calculateDocument(document: DocCraftDocument): CalculationResult
   const whtBasisIds = document.adjustments.wht.enabled
     ? new Set(document.adjustments.wht.basisLineItemIds)
     : new Set<string>();
-  const whtBasisAmount = sumMoney(
+  const whtEligibleLineAmount = sumMoney(
     lines.filter((line) => whtBasisIds.has(line.id)).map((line) => line.totalAmount),
   );
+  const whtBasisAmount = document.adjustments.wht.enabled && subtotal > 0
+    ? roundMoney((whtEligibleLineAmount * amountAfterDiscount) / subtotal)
+    : 0;
   const whtRatePercent = document.adjustments.wht.enabled
     ? document.adjustments.wht.ratePercent
     : 0;

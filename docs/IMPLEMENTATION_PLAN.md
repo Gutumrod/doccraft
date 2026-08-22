@@ -1,10 +1,10 @@
-# DocCraft — Implementation Plan
+﻿# DocCraft — Implementation Plan
 
-> **Status:** Documentation Freeze — Phase 1 paused after partial implementation began
+> **Status:** Phase 2 CLOSED — Gate 2 PASS after independent remediation; Phase 3 pending explicit intake/opening
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง
-> **D0 Rule:** ห้ามแก้ production code เพิ่มจน `DOCUMENTATION_READINESS_INDEX.md` ผ่าน D0 Documentation Gate
+> **D0:** PASS — implementation may proceed only under the current phase gate
 > **Execution rule:** ทำทีละ Phase; ห้ามเปิด Phase ถัดไปจน Gate ปัจจุบันผ่าน independent review
 
 ## 0. Execution Protocol
@@ -56,6 +56,7 @@
 - tax-invoice eligibility validation
 - line items, quantity, unit price, per-line/document discount ตาม PRD
 - VAT, WHT taxable/service basis, deposit และ final payable
+- document-level discount allocation ลด WHT basis แบบ proportional ตาม PRD ก่อนคำนวณ WHT
 - explicit money rounding policy และ pure calculation pipeline
 - validation result/error model ที่ UI เรียกใช้ได้ภายหลัง
 ### Required Tests

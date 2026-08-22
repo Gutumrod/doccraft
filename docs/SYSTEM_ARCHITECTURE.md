@@ -1,6 +1,6 @@
 # DocCraft — System Architecture Specification
 
-> **Status:** Authoritative Architecture Contract — Documentation Freeze
+> **Status:** Authoritative Architecture Contract — D0 Approved Baseline
 > **Version:** 2.0 Reality-Aligned
 > **Source of Truth:** Must conform to `PRD.md`
 > **Target:** Browser-first V1, backend optional only in post-MVP phases
@@ -61,6 +61,7 @@ Tax contract:
 - tax invoice capability อิง VAT registration + required fields
 - VAT rate และ rounding policy ต้องกำหนดจากจุดเดียว
 - WHT basis ต้องเลือกเฉพาะรายการที่เกี่ยวข้อง ไม่ใช้ยอดรวมทั้งเอกสารโดยอัตโนมัติ
+- document-level discount ต้องลด explicit WHT basis แบบ proportional allocation ตาม PRD; fixed/percent document discount ใช้ ratio `amountAfterDiscount / subtotal` กับ eligible line totals ก่อนคำนวณ WHT
 
 ## 4. Local Persistence
 

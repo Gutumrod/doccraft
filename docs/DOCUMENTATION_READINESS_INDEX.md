@@ -1,13 +1,13 @@
 # DocCraft — Documentation Readiness Index
 
-> **Status:** Documentation Content Complete — SELF-AUDIT PASS / Independent D0 Review Pending
+> **Status:** D0 DOCUMENTATION GATE — PASS
 > **Date:** 2026-08-22
-> **Policy:** Implementation is frozen until this gate is independently checked and marked PASS
+> **Policy:** Documentation baseline is approved; implementation may proceed only under the current phase brief and gate rules
 
-## 1. Current Freeze State
-Phase 1 source files already exist on disk, but further production-code changes are paused. Existing code is treated as an in-progress snapshot, not as permission to continue implementation.
+## 1. Current Implementation State
+D0 PASS and Gate 1 PASS are complete. Phase 2 implementation has now passed independent Gate 2 review after remediation under `BRIEF-phase2-editor-modular-blocks.md`.
 
-No production code should be added/modified until documentation consistency audit passes.
+Phase 2 is CLOSED. Phase 3 is eligible for explicit intake/briefing but remains unopened until that intake is performed.
 
 ## 2. Authority Layers
 ### Product / Engineering Authority
@@ -61,16 +61,13 @@ D0 passes only when:
 - Pilot Validation Gate is enforced before Phase 7
 - paid packaging/lifecycle/service responsibilities are defined before Phase 8 launch
 - marketing claims cannot outrun deployed capability
-- implementation status reflects the current code freeze accurately
+- implementation status reflects the current phase/gate state accurately
 - repository governance decision is explicit: standalone DocCraft repo before implementation resumes
 
-## 5. Reopen Implementation
-After independent D0 review returns PASS:
-1. update this file to `D0 PASS` with review evidence;
-2. complete the standalone DocCraft repository separation required by `RELEASE_AND_OPERATIONS_RUNBOOK.md`;
-3. re-check repo state, diff, dependencies and existing Phase 1 source files;
-4. update Phase 1 brief from `PAUSED` to `OPEN`;
-5. resume Phase 1 without assuming existing in-progress code is correct.
+## 5. Post-D0 Implementation State
+Independent D0 review and standalone repository separation are complete. Phase 1 is CLOSED with Gate 1 PASS.
+
+Phase 2 intake/implementation/review are also complete. Gate 2 PASS is recorded in `PHASE2_IMPLEMENTATION_EVIDENCE.md`; Phase 3 remains unopened pending explicit intake and brief.
 
 ## 6. Change Control
 Any future change to PRD/Architecture that affects scope, data, billing, privacy, support or launch gates must trigger a downstream documentation impact review before implementation continues.
@@ -78,10 +75,26 @@ Any future change to PRD/Architecture that affects scope, data, billing, privacy
 ## 7. Self-Audit Result — 2026-08-22
 Documentation completion sweep checked all 20 Markdown files on disk.
 
-**PASS in self-audit:** authority order, V1/post-MVP separation, PromptPay-vs-billing boundary, native-print boundary, Pilot Validation Gate, paid-launch operations, marketing claim guardrails, current code-freeze status and standalone-repository governance decision.
+**PASS in self-audit:** authority order, V1/post-MVP separation, PromptPay-vs-billing boundary, native-print boundary, Pilot Validation Gate, paid-launch operations, marketing claim guardrails, implementation-state tracking and standalone-repository governance decision.
 
-No stale `implementation not started`, `READY TO START`, or current `Phase 1 may open` language remains outside historical context.
-
-**Independent review still required:** another review must verify the files against disk before changing this document to `D0 PASS`.
+No stale `implementation not started` or `READY TO START` language remains outside historical context. Independent review is recorded below and supersedes the earlier pending state.
 
 Legal/privacy framework is complete for planning but is explicitly not legal sign-off; public-launch legal/privacy review remains a later release gate tied to actual deployed behavior.
+
+## 8. Independent D0 Review — 2026-08-22
+Reviewer pass re-read current authoritative, validation, operations, commercial and messaging documents against the standalone repository state.
+
+Verified: source-of-truth order; V1/post-MVP boundaries; PromptPay-vs-billing separation; native-print boundary; PV gate before Phase 7; paid-launch conditions; marketing guardrails; and repository separation.
+
+Repository evidence: standalone Git root at `products/DocCraft`, `origin=https://github.com/Gutumrod/doccraft.git`, `master` tracking `origin/master`, parent hub ignoring `/products/DocCraft/`.
+
+**Verdict: D0 PASS.** No known documentation contradiction blocked Phase 1. Phase 1 remediation/reverification is now complete and Gate 1 is PASS; Phase 2 remains unopened pending explicit Phase 2 intake.
+
+## 9. Post-D0 Amendment A1 — WHT Basis Allocation
+Gate 1 formula review found one ambiguity: how a document-level discount affects WHT-eligible line basis.
+
+Contract was clarified without expanding scope: document-level discount is allocated proportionally across line totals for WHT-basis purposes; line-specific discounts remain line-level.
+
+Impacted documents: `PRD.md`, `SYSTEM_ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `BRIEF-phase1-domain-calculation.md`. Downstream calculation code/tests were aligned and verified during Gate 1 review.
+
+**Amendment review:** consistent with V1 boundaries, does not change phase sequencing, and is included in the Gate 1 PASS evidence. D0 remains PASS.

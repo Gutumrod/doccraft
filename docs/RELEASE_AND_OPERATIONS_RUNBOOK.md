@@ -8,9 +8,9 @@
 No deployment is considered releasable because build succeeds alone. Release requires code/test evidence, browser smoke tests, scope review and rollback readiness.
 
 ### Source-Control Decision
-DocCraft target source-control model is a standalone Git repository rooted at `products/DocCraft`. The parent `saas-product-hub` keeps portfolio registry/reference only and should ignore the product working tree after separation.
+DocCraft uses a standalone Git repository rooted at `products/DocCraft`. The parent `saas-product-hub` keeps portfolio registry/reference only and ignores the product working tree.
 
-Before implementation resumes after D0, repository separation must be completed without losing current files/history, or this decision must be explicitly revised through documentation review. Current untracked-in-parent state is not an acceptable long-term release baseline.
+Repository separation was verified on 2026-08-22: local Git root resolves to `products/DocCraft`, `origin` points to `https://github.com/Gutumrod/doccraft.git`, `master` tracks `origin/master`, and the parent hub ignores `/products/DocCraft/`.
 
 ## 2. Required Release Pipeline
 `Clean scope check → Install → Lint → Typecheck → Unit/Integration → Build → Browser/E2E → Preview verification → Production deploy → Production smoke → Record release`

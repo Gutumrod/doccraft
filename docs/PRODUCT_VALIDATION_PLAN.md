@@ -1,6 +1,6 @@
 # DocCraft — Product Validation Plan
 
-> **Status:** Pre-Pilot Validation Contract — Documentation Freeze
+> **Status:** Pre-Pilot Validation Contract — D0 Approved Baseline
 > **Date:** 2026-08-22
 > **Purpose:** กำหนดว่าต้องเรียนรู้อะไรจาก Free MVP/Pilot ก่อนลงทุนใน Cloud/Pro
 

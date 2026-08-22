@@ -1,6 +1,6 @@
 # DocCraft — Product Requirements Document (PRD)
 
-> **Status:** Authoritative Product Contract — Documentation Freeze
+> **Status:** Authoritative Product Contract — D0 Approved Baseline
 > **Version:** 2.0 Reality-Aligned Draft
 > **Product:** Browser-first modular business document studio for Thailand
 > **Rule:** If another product document conflicts with this PRD on V1 scope or behavior, this PRD wins until the conflict is explicitly resolved.
@@ -94,6 +94,8 @@ Baseline:
 - document discount ใช้หลัง subtotal
 - VAT คำนวณเฉพาะเมื่อ VAT enabled และ business VAT registered
 - WHT ต้องคำนวณจากฐานที่ผู้ใช้กำหนดว่าเป็นรายการที่เข้าข่าย ไม่ใช่เหมารวมยอดเอกสารทั้งหมด
+- document-level discount ต้องลด WHT basis ตามสัดส่วนของยอด line ที่ผู้ใช้เลือกเป็น WHT-eligible เทียบกับ subtotal; deterministic baseline คือ `WHT basis = eligible line totals × amount after document discount ÷ subtotal` แล้ว round ด้วย policy กลาง (ถ้า subtotal = 0 ให้ basis = 0)
+- ถ้าส่วนลดเจาะจงเฉพาะรายการ ผู้ใช้ต้องใช้ line discount; document discount ถือเป็นส่วนลดที่กระจายตามสัดส่วนทั้งเอกสาร
 - net payable = amount after discount + VAT − WHT
 - deposit เป็น optional derived amount จาก percentage หรือ fixed amount ตาม mode ที่กำหนด
 
