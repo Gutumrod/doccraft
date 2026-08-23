@@ -1,6 +1,6 @@
 ﻿# DocCraft — Implementation Plan
 
-> **Status:** Phase 2 CLOSED — Gate 2 PASS after independent remediation; Phase 3 pending explicit intake/opening
+> **Status:** Phase 2 CLOSED — Gate 2 PASS after independent remediation. Phase 3 implementation complete under `BRIEF-phase3-a4-preview-print.md`; automated verification recorded in `PHASE3_IMPLEMENTATION_EVIDENCE.md`. Gate 3 NOT YET PASS — pending independent human review; Phase 4 must not open until then.
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง

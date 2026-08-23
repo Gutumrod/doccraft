@@ -1,12 +1,121 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 :root {
   color-scheme: light;
-  font-family: Arial, "Noto Sans Thai", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", "Thonburi", sans-serif;
   background: #f8fafc;
   color: #0f172a;
 }
 
-* { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; }
-body { min-height: 100vh; }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Phase 3: A4 & Native Print Stylesheet                                      */
+/* -------------------------------------------------------------------------- */
+
+@page {
+  size: A4 portrait;
+  margin: 12mm 15mm 15mm 15mm;
+}
+
+@media print {
+  /* Hide all application chrome, navigation, buttons, and editor controls */
+  .no-print,
+  [data-no-print="true"],
+  header,
+  nav,
+  aside,
+  button,
+  input,
+  select,
+  textarea,
+  .editor-pane,
+  .mobile-bottom-bar,
+  .global-validation-alert {
+    display: none !important;
+  }
+
+  /* Force document preview and its ancestors to be visible regardless of activeTab / screen viewports */
+  .preview-pane,
+  [data-testid="document-preview-container"] {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Reset document flow and background for clean printing */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure color fidelity (borders, soft background tints) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Main container unconstraint */
+  main {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* A4 document preview sheet formatting in print */
+  .a4-document-sheet {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+
+  /* Pagination & page-break rules */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  table {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    width: 100% !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Avoid trailing URLs on printed links */
+  a[href]:after {
+    content: none !important;
+  }
+}
