@@ -7,7 +7,9 @@
 ## 1. Current Implementation State
 D0 PASS and Gate 1 PASS are complete. Phase 2 implementation has now passed independent Gate 2 review after remediation under `BRIEF-phase2-editor-modular-blocks.md`.
 
-Phase 2 is CLOSED. Phase 3 (A4 Preview + Native Print) implementation is complete under `BRIEF-phase3-a4-preview-print.md` (written retroactively — implementation preceded the brief; see that document's Section 0). `PHASE3_IMPLEMENTATION_EVIDENCE.md` records automated verification (62/62 unit tests, typecheck, lint, build, 18/18 Playwright E2E all pass, independently rerun and confirmed on 2026-08-23). **Gate 3 is NOT YET PASS** — no independent human review has occurred, and the manual Chrome/Edge print-preview check remains unperformed. Phase 4 must not open until that review happens.
+Phase 2 is CLOSED. Phase 3 (A4 Preview + Native Print) implementation is complete under `BRIEF-phase3-a4-preview-print.md` (written retroactively — implementation preceded the brief; see that document's Section 0). `PHASE3_IMPLEMENTATION_EVIDENCE.md` records automated verification (62/62 unit tests, typecheck, lint, build, 18/18 Playwright E2E all pass, independently rerun and confirmed on 2026-08-23). **Gate 3 is NOT YET PASS** — no independent human review has occurred, and the manual Chrome/Edge print-preview check remains unperformed.
+
+Phase 4 (Local Persistence + JSON Backup) implementation is also complete, ahead of Gate 3 review, by explicit user direction rather than following the documented sequencing rule. `PHASE4_IMPLEMENTATION_EVIDENCE.md` records automated verification (92/92 unit tests, 29/29 Playwright E2E, typecheck/lint/build clean, independently rerun and confirmed on 2026-08-23). Item-image upload/compression from the Phase 4 task list was deferred (disclosed in that evidence doc, not a bug). **Gate 4 is also NOT YET PASS** — same reason: no independent human review yet. Phase 5 must not open until at least Gate 3 receives that review.
 
 ## 2. Authority Layers
 ### Product / Engineering Authority
@@ -67,7 +69,7 @@ D0 passes only when:
 ## 5. Post-D0 Implementation State
 Independent D0 review and standalone repository separation are complete. Phase 1 is CLOSED with Gate 1 PASS.
 
-Phase 2 intake/implementation/review are also complete. Gate 2 PASS is recorded in `PHASE2_IMPLEMENTATION_EVIDENCE.md`. Phase 3 implementation is complete and automated verification is recorded in `PHASE3_IMPLEMENTATION_EVIDENCE.md`, but Gate 3 has not received independent human review and is not yet PASS.
+Phase 2 intake/implementation/review are also complete. Gate 2 PASS is recorded in `PHASE2_IMPLEMENTATION_EVIDENCE.md`. Phase 3 and Phase 4 implementation are both complete and automated verification is recorded in `PHASE3_IMPLEMENTATION_EVIDENCE.md` and `PHASE4_IMPLEMENTATION_EVIDENCE.md` respectively, but neither Gate 3 nor Gate 4 has received independent human review — neither is yet PASS.
 
 ## 6. Change Control
 Any future change to PRD/Architecture that affects scope, data, billing, privacy, support or launch gates must trigger a downstream documentation impact review before implementation continues.

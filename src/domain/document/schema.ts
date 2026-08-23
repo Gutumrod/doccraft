@@ -1,7 +1,7 @@
-import { DOCUMENT_TYPES, type DiscountConfig, type DocCraftDocument } from './types';
+import { CURRENT_SCHEMA_VERSION, DOCUMENT_TYPES, type DiscountConfig, type DocCraftDocument } from './types';
 import { invalid, issue, valid, type ValidationIssue, type ValidationResult } from '../validation/result';
 
-export const CURRENT_SCHEMA_VERSION = 1;
+export { CURRENT_SCHEMA_VERSION };
 
 function isNonBlank(value: string | undefined): boolean {
   return typeof value === 'string' && value.trim().length > 0;

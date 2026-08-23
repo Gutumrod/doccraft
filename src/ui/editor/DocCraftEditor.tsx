@@ -42,11 +42,11 @@ import { TermsNotesSection } from './sections/TermsNotesSection';
 export function DocCraftEditor() {
   const [doc, setDoc] = useState<DocCraftDocument>(() => createInitialDocument());
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [storageStatus, setStorageStatus] = useState<StorageStatus>('idle');
+  const [storageStatus, setStorageStatus] = useState<StorageStatus>('saved');
   const [storageNotice, setStorageNotice] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInitialized = useRef(false);
 
   // Pure calculation result derived from domain rules on every render
   const calcResult = calculateDocument(doc);
@@ -54,39 +54,42 @@ export function DocCraftEditor() {
   const totals = calcResult.ok ? calcResult.value : undefined;
   const errors = !calcResult.ok ? calcResult.errors : [];
 
-  // 1. Initial draft restoration on client mount
+  // Restore draft from browser storage on client mount
   useEffect(() => {
-    const loadResult = loadDraft();
-    if (loadResult.ok) {
-      if (loadResult.value) {
-        setDoc(loadResult.value);
-        setStorageStatus('saved');
+    queueMicrotask(() => {
+      const loadResult = loadDraft();
+      if (loadResult.ok) {
+        if (loadResult.value) {
+          setDoc(loadResult.value);
+          setStorageStatus('saved');
+        }
       } else {
-        setStorageStatus('idle');
+        setStorageNotice(`⚠️ ไม่สามารถกู้คืนข้อมูลเดิมได้: ${loadResult.error.message}`);
+        setStorageStatus('error');
       }
-    } else {
-      setStorageNotice(`⚠️ ไม่สามารถกู้คืนข้อมูลเดิมได้: ${loadResult.error.message}`);
-      setStorageStatus('error');
-    }
-    setIsInitialized(true);
+      isInitialized.current = true;
+    });
   }, []);
 
-  // 2. Autosave effect when document state updates (after initialization)
+  // Autosave effect with debounce when document state updates (after mount initialization)
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitialized.current) return;
 
-    setStorageStatus('saving');
-    const saveResult = saveDraft(doc);
-    if (saveResult.ok) {
-      setStorageStatus('saved');
-      setStorageNotice(null);
-    } else {
-      setStorageStatus('error');
-      setStorageNotice(
-        '⚠️ ไม่สามารถบันทึกข้อมูลลงในเบราว์เซอร์ได้ (พื้นที่เต็มหรือเบราว์เซอร์บล็อก LocalStorage) - คุณยังสามารถแก้ไขและ Export JSON ได้'
-      );
-    }
-  }, [doc, isInitialized]);
+    const timer = setTimeout(() => {
+      const saveResult = saveDraft(doc);
+      if (saveResult.ok) {
+        setStorageStatus('saved');
+        setStorageNotice(null);
+      } else {
+        setStorageStatus('error');
+        setStorageNotice(
+          '⚠️ ไม่สามารถบันทึกข้อมูลลงในเบราว์เซอร์ได้ (พื้นที่เต็มหรือเบราว์เซอร์บล็อก LocalStorage) - คุณยังสามารถแก้ไขและ Export JSON ได้'
+        );
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [doc]);
 
   const handlePrint = () => {
     // Fail-closed protection: never invoke native print for invalid documents
@@ -121,6 +124,7 @@ export function DocCraftEditor() {
       const importResult = importDocumentFromJson(content);
       if (importResult.ok) {
         setDoc(importResult.value);
+        saveDraft(importResult.value);
         setImportError(null);
       } else {
         setImportError(`⚠️ นำเข้าไฟล์ไม่สำเร็จ: ${importResult.error.message}`);
@@ -143,6 +147,7 @@ export function DocCraftEditor() {
 
   const loadFixture = (fixture: DocCraftDocument) => {
     setDoc(fixture);
+    saveDraft(fixture);
     setImportError(null);
   };
 

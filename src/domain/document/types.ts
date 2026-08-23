@@ -1,5 +1,7 @@
 import type { BusinessProfile, VatConfig } from '../tax/types';
 
+export const CURRENT_SCHEMA_VERSION = 1;
+
 export const DOCUMENT_TYPES = [
   'quotation',
   'invoice',
