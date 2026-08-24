@@ -200,3 +200,13 @@ quotation→invoice→receipt conversion, Excel/monthly reports, templates/theme
 
 ## Stop Conditions
 หยุด Phase ทันทีถ้าพบ contradiction ใหม่ใน Source of Truth, ต้องเปลี่ยน architecture หลัก, scope ต้องข้าม Phase, หรือ test ไม่สามารถพิสูจน์ acceptance criterion ได้ — ต้องแก้เอกสาร/brief และ review ใหม่ก่อนทำต่อ
+
+## Current Gate Amendment — 2026-08-24
+The independent review at `GATE_REVIEW_PHASE3_PHASE4_2026-08-24.md` supersedes any assumption that Phase 3/4 are ready to close merely because automated evidence is green.
+
+- **Gate 3: REMEDIATE** — manual Chrome/Edge reference print acceptance required by PRD §13 remains unperformed.
+- **Gate 4: REMEDIATE** — item-image resize/compression/encoded-size guard required by PRD §9, Architecture §4 and ROADMAP Phase 4 is not implemented.
+- **Next executable brief:** `BRIEF-phase4-remediation-image-pipeline.md`.
+- **Phase 5:** `BRIEF-phase5-promptpay-qr.md` is prepared for handoff but remains `PREPARED — NOT OPENED` until both gates are PASS.
+
+No Phase 5 production code may be written under this plan while either remediation remains open.

@@ -100,3 +100,14 @@ Contract was clarified without expanding scope: document-level discount is alloc
 Impacted documents: `PRD.md`, `SYSTEM_ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `BRIEF-phase1-domain-calculation.md`. Downstream calculation code/tests were aligned and verified during Gate 1 review.
 
 **Amendment review:** consistent with V1 boundaries, does not change phase sequencing, and is included in the Gate 1 PASS evidence. D0 remains PASS.
+
+## 10. Gate Review Amendment — 2026-08-24
+Independent repository review is recorded in `GATE_REVIEW_PHASE3_PHASE4_2026-08-24.md`.
+
+Current executable status:
+- Phase 3 implementation: complete; **Gate 3 = REMEDIATE** pending real Chrome/Edge manual print acceptance.
+- Phase 4 implementation: persistence/backup core complete; **Gate 4 = REMEDIATE** because the authoritative V1 item-image resize/compression/encoded-size guard is still missing.
+- Next implementation work: `BRIEF-phase4-remediation-image-pipeline.md`.
+- Phase 5 brief exists at `BRIEF-phase5-promptpay-qr.md` for handoff preparation only; **Phase 5 is NOT OPENED** until Gate 3 and Gate 4 are PASS.
+
+Fresh 2026-08-24 verification: 92/92 unit tests, typecheck, lint and production build pass. Playwright E2E rerun was environment-blocked by a missing local Playwright Chromium executable; the existing 2026-08-23 evidence records 29/29 passing and is not rewritten as a fresh result.
