@@ -10,8 +10,8 @@ import {
 } from '../../src/domain/fixtures/representative-documents';
 
 describe('Phase 3 — Representative Document Fixtures & Print Validation', () => {
-  it('1. onePageQuotationFixture passes pure calculation and conforms to schema v1', () => {
-    expect(onePageQuotationFixture.schemaVersion).toBe(1);
+  it('1. onePageQuotationFixture passes pure calculation and conforms to schema v2', () => {
+    expect(onePageQuotationFixture.schemaVersion).toBe(2);
     expect(onePageQuotationFixture.items.length).toBe(3);
 
     const calcResult = calculateDocument(onePageQuotationFixture);
@@ -39,7 +39,7 @@ describe('Phase 3 — Representative Document Fixtures & Print Validation', () =
   });
 
   it('2. multiPageDocumentFixture passes calculation for 20+ line items', () => {
-    expect(multiPageDocumentFixture.schemaVersion).toBe(1);
+    expect(multiPageDocumentFixture.schemaVersion).toBe(2);
     expect(multiPageDocumentFixture.items.length).toBe(22);
 
     const calcResult = calculateDocument(multiPageDocumentFixture);
@@ -55,7 +55,7 @@ describe('Phase 3 — Representative Document Fixtures & Print Validation', () =
   });
 
   it('3. richThaiTextFixture passes calculation and verifies Thai metadata', () => {
-    expect(richThaiTextFixture.schemaVersion).toBe(1);
+    expect(richThaiTextFixture.schemaVersion).toBe(2);
     expect(richThaiTextFixture.documentType).toBe('receipt');
     expect(richThaiTextFixture.business.displayName).toContain('นายกิตติศักดิ์ พรหมมินทร์ปรีชากุล');
     expect(richThaiTextFixture.customer.displayName).toContain('คุณหญิงประไพศรี');
@@ -75,7 +75,7 @@ describe('Phase 3 — Representative Document Fixtures & Print Validation', () =
   });
 
   it('4. longCustomerAndAddressFixture passes calculation for registered tax invoice', () => {
-    expect(longCustomerAndAddressFixture.schemaVersion).toBe(1);
+    expect(longCustomerAndAddressFixture.schemaVersion).toBe(2);
     expect(longCustomerAndAddressFixture.documentType).toBe('tax_invoice');
 
     const calcResult = calculateDocument(longCustomerAndAddressFixture);

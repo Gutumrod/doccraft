@@ -1,4 +1,4 @@
-import type { DocCraftDocument } from '../document/types';
+import { CURRENT_SCHEMA_VERSION, type DocCraftDocument } from '../document/types';
 
 /**
  * Standard 1-page quotation fixture with normal length text and 3 line items.
@@ -73,7 +73,7 @@ export const onePageQuotationFixture: DocCraftDocument = {
   },
   terms: '1. ใบเสนอราคานี้มีผลบังคับใช้ 30 วันนับจากวันที่ออกเอกสาร\n2. กำหนดชำระเงินงวดแรก (มัดจำ) 50% ก่อนเริ่มปฏิบัติงาน\n3. ส่วนที่เหลือชำระภายใน 7 วันหลังจากส่งมอบงานงวดสุดท้าย',
   notes: 'ระยะเวลาดำเนินงานประมาณ 4-6 สัปดาห์นับจากได้รับเงินมัดจำและข้อมูลครบถ้วน',
-  schemaVersion: 1,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   createdAt: '2026-08-23T08:00:00.000Z',
   updatedAt: '2026-08-23T08:00:00.000Z',
 };
@@ -137,7 +137,7 @@ export const multiPageDocumentFixture: DocCraftDocument = {
   },
   terms: '1. กรุณาชำระเงินตามกำหนดเวลาที่ระบุในใบแจ้งหนี้\n2. กรณีชำระเงินล่าช้ากว่ากำหนด บริษัทฯ ขอสงวนสิทธิ์ในการคิดดอกเบี้ยปรับตามอัตราที่กฎหมายกำหนด\n3. สินค้าที่ส่งมอบแล้วไม่สามารถเปลี่ยนหรือคืนได้ ยกเว้นกรณีพบข้อบกพร่องจากการผลิตภายใน 7 วัน\n4. ใบแจ้งหนี้นี้ยังไม่ใช่ใบเสร็จรับเงิน ใบเสร็จรับเงินที่สมบูรณ์จะออกให้เมื่อได้รับการชำระเงินเรียบร้อยแล้ว',
   notes: 'กรุณาส่งหลักฐานการโอนเงิน (Pay-in Slip) พร้อมระบุเลขที่ใบแจ้งหนี้มาที่ accounting@thaimegacon.co.th เพื่อออกใบเสร็จรับเงิน',
-  schemaVersion: 1,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   createdAt: '2026-08-23T08:00:00.000Z',
   updatedAt: '2026-08-23T08:00:00.000Z',
 };
@@ -200,7 +200,7 @@ export const richThaiTextFixture: DocCraftDocument = {
   },
   terms: 'รับประกันคุณภาพงานติดตั้งและอุปกรณ์ฟิตติ้งเป็นเวลา 1 ปีเต็มนับตั้งแต่วันส่งมอบงาน',
   notes: 'ได้รับเงินชำระครบถ้วนเรียบร้อยแล้ว ขอขอบพระคุณที่ไว้วางใจใช้บริการ',
-  schemaVersion: 1,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   createdAt: '2026-08-23T08:00:00.000Z',
   updatedAt: '2026-08-23T08:00:00.000Z',
 };
@@ -264,7 +264,7 @@ export const longCustomerAndAddressFixture: DocCraftDocument = {
   },
   terms: 'การชำระเงินต้องหักภาษี ณ ที่จ่าย 3% ตามมาตรา 3 เตรส และนำส่งหนังสือรับรองการหักภาษี ณ ที่จ่าย (ใบ 50 ทวิ) ให้แก่บริษัทฯ ภายใน 15 วันทำการ',
   notes: 'เอกสารนี้ออกโดยระบบอิเล็กทรอนิกส์และได้รับการตรวจสอบความถูกต้องแล้ว',
-  schemaVersion: 1,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   createdAt: '2026-08-23T08:00:00.000Z',
   updatedAt: '2026-08-23T08:00:00.000Z',
 };
@@ -275,6 +275,19 @@ export const longCustomerAndAddressFixture: DocCraftDocument = {
 export const withItemImagesFixture: DocCraftDocument = {
   ...onePageQuotationFixture,
   id: 'doc-fixture-with-images',
+  items: onePageQuotationFixture.items.map((item, index) =>
+    index === 0
+      ? {
+          ...item,
+          image: {
+            dataUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAEAAQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6VooooA//2Q==',
+            mimeType: 'image/jpeg',
+            width: 4,
+            height: 4,
+          },
+        }
+      : item,
+  ),
   blocks: {
     ...onePageQuotationFixture.blocks,
     itemImages: true,

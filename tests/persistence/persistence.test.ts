@@ -181,7 +181,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
     it('accepts valid persisted envelope with savedAt', () => {
       const envelope = {
         storageFormatVersion: 1,
-        schemaVersion: 1,
+        schemaVersion: 2,
         savedAt: new Date().toISOString(),
         document: onePageQuotationFixture,
       };
@@ -190,10 +190,37 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       expect(res.ok).toBe(true);
     });
 
+    it('migrates a valid v1 local draft to canonical v2 without unrelated data loss', () => {
+      const legacyDocument = JSON.parse(JSON.stringify(onePageQuotationFixture));
+      legacyDocument.schemaVersion = 1;
+      legacyDocument.items = legacyDocument.items.map((item: Record<string, unknown>) => { const copy = { ...item }; delete copy.image; return copy; });
+      const envelope = { storageFormatVersion: 1, schemaVersion: 1, savedAt: '2026-08-24T00:00:00.000Z', document: legacyDocument };
+
+      const res = migratePersistedEnvelope(envelope);
+      expect(res.ok).toBe(true);
+      if (res.ok) {
+        expect(res.value.schemaVersion).toBe(2);
+        expect(res.value.id).toBe(onePageQuotationFixture.id);
+        expect(res.value.createdAt).toBe(onePageQuotationFixture.createdAt);
+        expect(res.value.items.map((item) => item.id)).toEqual(onePageQuotationFixture.items.map((item) => item.id));
+        expect(res.value.items.every((item) => item.image === undefined)).toBe(true);
+      }
+    });
+
+    it('migrates a valid v1 exported backup to canonical v2', () => {
+      const legacyDocument = JSON.parse(JSON.stringify(onePageQuotationFixture));
+      legacyDocument.schemaVersion = 1;
+      legacyDocument.items = legacyDocument.items.map((item: Record<string, unknown>) => { const copy = { ...item }; delete copy.image; return copy; });
+      const envelope = { app: 'DocCraft', storageFormatVersion: 1, schemaVersion: 1, exportedAt: '2026-08-24T00:00:00.000Z', document: legacyDocument };
+      const res = migrateExportEnvelope(envelope);
+      expect(res.ok).toBe(true);
+      if (res.ok) expect(res.value.schemaVersion).toBe(2);
+    });
+
     it('rejects persisted envelope missing savedAt metadata', () => {
       const envelopeWithoutSavedAt = {
         storageFormatVersion: 1,
-        schemaVersion: 1,
+        schemaVersion: 2,
         document: onePageQuotationFixture,
       };
 
@@ -209,7 +236,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       const exportWithoutExportedAt = {
         app: 'DocCraft',
         storageFormatVersion: 1,
-        schemaVersion: 1,
+        schemaVersion: 2,
         document: onePageQuotationFixture,
       };
 
@@ -270,7 +297,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       const exportEnvelope = {
         app: 'DocCraft',
         storageFormatVersion: 1,
-        schemaVersion: 1,
+        schemaVersion: 2,
         exportedAt: new Date().toISOString(),
         document: onePageQuotationFixture,
       };
@@ -325,7 +352,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
 
       expect(parsed.app).toBe('DocCraft');
       expect(parsed.storageFormatVersion).toBe(1);
-      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.schemaVersion).toBe(2);
       expect(parsed.exportedAt).toBeDefined();
       expect(parsed.document.id).toBe(onePageQuotationFixture.id);
     });
@@ -416,7 +443,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
     it('rejects import with invalid document structure (e.g. wrong field types)', () => {
       const invalidPayload = {
         app: 'DocCraft',
-        schemaVersion: 1,
+        schemaVersion: 2,
         storageFormatVersion: 1,
         exportedAt: new Date().toISOString(),
         document: {

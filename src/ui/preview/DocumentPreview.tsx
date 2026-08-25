@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Canonical item images are client-processed data URLs and must render unchanged. */
 'use client';
 
 import React from 'react';
@@ -167,10 +168,13 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
                     <td className="py-3 px-2 text-center text-slate-500 font-mono align-top">{idx + 1}</td>
                     <td className="py-3 px-3 align-top break-words">
                       <div className="font-medium text-slate-950 leading-relaxed break-words">{item.description}</div>
-                      {blocks.itemImages && (
-                        <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-slate-500 bg-slate-50 border border-slate-200/80 rounded px-2 py-0.5 w-fit">
-                          <span>🖼️ รูปภาพประกอบสินค้า</span>
-                        </div>
+                      {blocks.itemImages && item.image && (
+                        <img
+                          src={item.image.dataUrl}
+                          alt={`รูปประกอบ ${item.description || `รายการ ${idx + 1}`}`}
+                          data-testid={`preview-item-image-${item.id}`}
+                          className="item-image-preview mt-2 max-h-24 max-w-32 rounded-md border border-slate-200 bg-white object-contain"
+                        />
                       )}
                     </td>
                     <td className="py-3 px-2 text-right font-mono text-slate-800 align-top">{item.quantity}</td>

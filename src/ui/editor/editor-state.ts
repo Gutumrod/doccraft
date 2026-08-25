@@ -84,6 +84,7 @@ export function addLineItem(
     quantity: initial?.quantity ?? 1,
     unitPrice: initial?.unitPrice ?? 0,
     discount: initial?.discount ?? { mode: 'none' },
+    image: initial?.image,
   };
 
   return {

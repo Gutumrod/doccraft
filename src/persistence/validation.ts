@@ -8,6 +8,7 @@ import {
   type LineItem,
 } from '../domain/document/types';
 import type { BranchType, EntityType, VatStatus } from '../domain/tax/types';
+import { validateItemImageStructure } from '../image/item-image';
 import { createPersistenceError } from './errors';
 import type { PersistenceResult } from './types';
 
@@ -79,6 +80,18 @@ function validateLineItem(raw: unknown, index: number): PersistenceResult<LineIt
   const discountRes = validateDiscount(raw.discount, `${path}.discount`);
   if (!discountRes.ok) return discountRes;
 
+  let image;
+  if (raw.image !== undefined) {
+    const imageRes = validateItemImageStructure(raw.image);
+    if (!imageRes.ok) {
+      return {
+        ok: false,
+        error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', `${path}.image: ${imageRes.message}`),
+      };
+    }
+    image = imageRes.value;
+  }
+
   return {
     ok: true,
     value: {
@@ -87,6 +100,7 @@ function validateLineItem(raw: unknown, index: number): PersistenceResult<LineIt
       quantity: raw.quantity,
       unitPrice: raw.unitPrice,
       discount: discountRes.value,
+      image,
     },
   };
 }

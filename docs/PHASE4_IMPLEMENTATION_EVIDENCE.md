@@ -277,3 +277,185 @@ What is disclosed as an open scope gap, not a bug:
 - Item-image upload, client-side compression, and encoded-size guard from the ROADMAP's Phase 4 task list were not built. Section 1.6 defers this to avoid touching the closed Phase 1 schema; if this capability is still wanted for V1, it needs its own scoped follow-up rather than being folded silently into "Gate 4 PASS."
 
 **Recommendation:** do not mark Gate 3 or Gate 4 PASS in `DOCUMENTATION_READINESS_INDEX.md` until a human has reviewed both phases' actual diffs/behavior, per `IMPLEMENTATION_PLAN.md`'s own review requirement. Phase 5 should not open until at least Gate 3 (and ideally Gate 4) receive that review.
+
+
+---
+
+## 9. Phase 4 Remediation Addendum — Item Image Persistence Pipeline (2026-08-25)
+
+### 9.1 Remediation objective and provenance
+
+This addendum records the continuation and verification of the Phase 4 remediation authorized by `BRIEF-phase4-remediation-image-pipeline.md`.
+
+- Baseline HEAD: `fc80742c98f5135229dae2cc8f0ac4803a149a07`.
+- Branch: `master`.
+- Remediation started from the existing dirty working tree; no reset, checkout, or discard of prior remediation work was performed.
+- No remediation commit existed at verification start. The final commit SHA is reported by the repository history/final handoff after this evidence is committed; a commit cannot stably contain its own SHA.
+- No temporary `.phase4_patch_ui.py` or `.phase4_patch_tests.py` helper remained.
+- A temporary system-Chrome Playwright config used only to isolate browser-runtime failures was removed before final diff review.
+
+**Objective:** complete the browser-only item-image pipeline without changing Phase 1 calculation/tax contracts, backend/cloud architecture, or native-print strategy.
+
+### 9.2 Canonical schema v2
+
+`CURRENT_SCHEMA_VERSION` is now `2`. `LineItem` has optional canonical `image?: ItemImage` with exactly:
+
+```ts
+interface ItemImage {
+  dataUrl: string;
+  mimeType: 'image/jpeg' | 'image/webp';
+  width: number;
+  height: number;
+}
+```
+
+Image metadata/data does not participate in financial, VAT, WHT, deposit, rounding, or tax-invoice calculations.
+
+### 9.3 Explicit v1 → v2 migration behavior
+
+Both persisted local envelopes and exported backup envelopes negotiate schema versions before state replacement.
+
+- Valid v1 envelope + inner v1 document migrates to canonical v2.
+- Document ID, line-item IDs, `createdAt`, `updatedAt`, business/customer data, adjustments, payment, blocks, terms, and notes are preserved.
+- Legacy v1 items migrate with `image` absent.
+- A v1 payload containing any line-item `image` field is rejected instead of silently accepting v2 data in a v1 envelope.
+- Canonical v2 envelopes validate directly.
+- Future schema versions fail closed.
+- Envelope/document schema-version mismatch fails closed.
+- Malformed restore/import payloads do not replace active editor state.
+
+### 9.4 Image processing and persistence contract
+
+Centralized constants in `src/image/item-image.ts`:
+
+- accepted source MIME: JPEG, PNG, WebP;
+- persisted MIME: JPEG or WebP;
+- maximum processed long edge: `960 px`;
+- maximum persisted `dataUrl`: `262,144` UTF-8 bytes;
+- initial lossy quality: `0.82`;
+- maximum encode/reduction attempts: `4`;
+- retry dimension scale: `0.85`;
+- retry quality decrement: `0.12`.
+
+The pipeline attempts WebP first and falls back to JPEG. JPEG fallback paints a white canvas background before drawing the source, preventing transparent pixels from becoming an unintended dark/transparent background. Acceptance is based on the actual final persisted `dataUrl` byte length, not source `File.size`.
+
+### 9.5 Structural image validation and editor behavior
+
+Persistence/import validation rejects unsupported MIME, MIME/data-URL prefix mismatch, invalid base64, external/blob/SVG/HTML URLs, non-positive or >960 px dimensions, oversized persisted data URLs, and unsupported/missing image fields under the strict four-field representation.
+
+Editor behavior verified in code/tests:
+
+- attach/replace mutates only the targeted line item after processing succeeds;
+- failed replacement preserves the previous accepted image/document state;
+- remove clears only the targeted line-item image;
+- image-processing state and inline error are visible; no browser `alert()` is used;
+- hiding `blocks.itemImages` preserves canonical image data and showing it again restores the image UI;
+- a React hook-order defect in `ItemsSection` was corrected by moving image-processing hooks before the `isVisible` early return.
+
+Preview/print renders canonical `item.image.dataUrl` only when the item-image block is enabled. No fake image placeholder is rendered in the document preview when image data is absent. Editor upload/remove controls remain outside the printable preview and are hidden by the existing Phase 3 print rules.
+
+### 9.6 Unit/domain verification
+
+Final repository command:
+
+```text
+pnpm test
+Test Files  9 passed (9)
+Tests       117 passed (117)
+```
+
+`tests/persistence/item-image-remediation.test.ts` adds 23 focused remediation tests covering canonical v2 acceptance, real legacy-v1 migration, v1 image injection rejection, image structural validation, persistence/export round trips, quota-state preservation, hide/show/remove behavior, failed replacement preservation, calculation isolation, supported source MIME handling, JPEG fallback, and the bounded four-attempt failure path.
+
+### 9.7 Typecheck, lint, and build
+
+Final repository commands all completed successfully:
+
+```text
+pnpm typecheck
+# tsc --noEmit — PASS
+
+pnpm lint
+# eslint . — PASS, 0 errors / 0 warnings
+
+pnpm build
+# Next.js 16.3.1 production build — PASS
+# Static routes: / and /_not-found
+```
+
+### 9.8 Playwright verification
+
+The missing Playwright-managed Chromium runtime was installed with the repository's own Playwright version using:
+
+```text
+pnpm exec playwright install chromium
+# Installed Playwright Chromium / headless-shell revision v1234
+```
+
+The exact repository gate command then completed successfully from the normal `playwright.config.ts`:
+
+```text
+pnpm test:e2e
+Running 32 tests using 4 workers
+32 passed (7.2s)
+```
+
+This managed-Chromium run includes all existing Phase 2/3/4 regression coverage plus the three new Phase 4 image-pipeline E2E scenarios: attach/persist/reload/export-import/remove/print; unsupported replacement with previous-image preservation; and quota failure with accepted image/editor state plus JSON export remaining available.
+
+A prior diagnostic run against installed Google Chrome also passed 32/32 after one stale Phase 3 placeholder assertion was corrected to assert the actual canonical preview image. That diagnostic config was temporary and was removed before final diff review.
+
+### 9.9 Storage quota, JSON round-trip, and print/image results
+
+- `saveDraft` quota failure returns `STORAGE_QUOTA_EXCEEDED` without mutating the in-memory document/image.
+- Accepted image data survives `saveDraft → loadDraft`.
+- Accepted image data survives JSON `serialize/export → import`.
+- Browser E2E verifies localStorage envelope/document schemaVersion `2` and persisted image data after attachment.
+- Reload restores the image; export contains the image; reset/import restores it again.
+- Quota failure leaves editor state and JSON export operational.
+- Preview and print-media verification show the actual canonical image while upload/remove/editor controls are not printable.
+- Responsive image presentation uses constrained dimensions with `object-contain`; system-Chrome E2E found no blocking horizontal overflow in the covered flow.
+
+### 9.10 Files changed by the remediation
+
+Production/remediation files:
+
+- `src/domain/document/types.ts`
+- `src/domain/fixtures/representative-documents.ts`
+- `src/image/item-image.ts`
+- `src/persistence/migration.ts`
+- `src/persistence/validation.ts`
+- `src/ui/editor/editor-state.ts`
+- `src/ui/editor/sections/ItemsSection.tsx`
+- `src/ui/preview/DocumentPreview.tsx`
+
+Tests/documentation:
+
+- `tests/persistence/persistence.test.ts`
+- `tests/persistence/item-image-remediation.test.ts`
+- `tests/ui/preview-print.test.ts`
+- `tests/e2e/phase3-print.spec.ts`
+- `tests/e2e/phase4-persistence.spec.ts`
+- `tests/e2e/phase4-item-images.spec.ts`
+- `BRIEF-phase4-remediation-image-pipeline.md`
+- `docs/PHASE4_IMPLEMENTATION_EVIDENCE.md`
+
+### 9.11 Scope-drift review, limitations, and disposition
+
+`git diff --check` passes after whitespace cleanup. No diff exists under `src/domain/calculation` or `src/domain/tax`, and the remediation diff contains no Supabase, API-route, backend/cloud, PDF-generation, billing, or payment implementation.
+
+Therefore there are no changes to VAT formulas, WHT formulas, deposit formulas, rounding behavior, or tax-invoice eligibility semantics.
+
+Known limitations remain intentionally within the remediation brief:
+
+- one canonical processed image per line item;
+- no crop/editor UI, OCR/AI processing, reusable image library, CDN/cloud image storage, or backend processing;
+- browser LocalStorage capacity is environment-dependent and no fixed total quota is assumed;
+
+### 9.12 Reviewer-ready conclusion
+
+**Implementation remediation is complete and all repository verification gates now pass, including the normal Playwright-managed Chromium run (`32/32`).**
+
+This addendum intentionally does **not** self-declare Gate 4 PASS because the project process requires independent reviewer signoff. The recommended disposition is:
+
+> **Implementation remediation complete — ready for independent Gate 4 review.**
+
+No known technical or environment blocker remains for independent Gate 4 review. Gate 4 should be marked PASS only by the designated independent reviewer after reviewing this remediation commit and evidence.

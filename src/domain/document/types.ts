@@ -1,6 +1,6 @@
 import type { BusinessProfile, VatConfig } from '../tax/types';
 
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 export const DOCUMENT_TYPES = [
   'quotation',
@@ -25,12 +25,20 @@ export type DiscountConfig =
   | { mode: 'percent'; value: number }
   | { mode: 'fixed'; value: number };
 
+export interface ItemImage {
+  dataUrl: string;
+  mimeType: 'image/jpeg' | 'image/webp';
+  width: number;
+  height: number;
+}
+
 export interface LineItem {
   id: string;
   description: string;
   quantity: number;
   unitPrice: number;
   discount: DiscountConfig;
+  image?: ItemImage;
 }
 
 export interface WhtConfig {

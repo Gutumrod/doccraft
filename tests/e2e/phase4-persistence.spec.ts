@@ -140,7 +140,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
     const exportedJson = Buffer.concat(chunks).toString('utf-8');
     const parsedEnvelope = JSON.parse(exportedJson);
     expect(parsedEnvelope.app).toBe('DocCraft');
-    expect(parsedEnvelope.schemaVersion).toBe(1);
+    expect(parsedEnvelope.schemaVersion).toBe(2);
 
     // 3. Reset document state via New Document button
     await page.getByTestId('btn-new-document').click();

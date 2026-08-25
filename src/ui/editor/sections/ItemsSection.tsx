@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element -- Canonical item images are client-processed data URLs and must render unchanged. */
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { CalculatedLine } from '../../../domain/calculation/types';
+import { processItemImageFile } from '../../../image/item-image';
 import type { DiscountConfig, LineItem } from '../../../domain/document/types';
 
 interface ItemsSectionProps {
@@ -23,6 +25,9 @@ export function ItemsSection({
   isVisible,
   showItemImages,
 }: ItemsSectionProps) {
+  const [processingItemId, setProcessingItemId] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, string>>({});
+
   if (!isVisible) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-500 flex items-center justify-between">
@@ -32,6 +37,30 @@ export function ItemsSection({
   }
 
   const lineMap = new Map(calculatedLines.map((line) => [line.id, line]));
+
+  const clearImageError = (itemId: string) => {
+    setImageErrors((current) => {
+      if (!(itemId in current)) return current;
+      const next = { ...current };
+      delete next[itemId];
+      return next;
+    });
+  };
+
+  const handleImageFile = async (itemId: string, file?: File) => {
+    if (!file) return;
+    clearImageError(itemId);
+    setProcessingItemId(itemId);
+    try {
+      const image = await processItemImageFile(file);
+      onUpdateItem(itemId, { image });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'ประมวลผลรูปภาพไม่สำเร็จ';
+      setImageErrors((current) => ({ ...current, [itemId]: message }));
+    } finally {
+      setProcessingItemId((current) => (current === itemId ? null : current));
+    }
+  };
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
@@ -90,15 +119,46 @@ export function ItemsSection({
                 </div>
               </div>
 
-              {/* Item Image Placeholder slot if enabled */}
               {showItemImages && (
-                <div className="mb-3 flex items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-white p-2.5 text-xs text-slate-500">
-                  <div className="flex h-12 w-12 items-center justify-center rounded bg-slate-100 text-slate-400">
-                    🖼️
-                  </div>
-                  <div>
-                    <span className="font-medium text-slate-700">รูปภาพประกอบรายการ</span>
-                    <span className="block text-[11px] text-slate-400">(บล็อกรูปภาพแสดงผลในพรีวิว)</span>
+                <div className="mb-3 rounded-lg border border-dashed border-slate-300 bg-white p-3 text-xs text-slate-600">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    {item.image ? (
+                      <img
+                        src={item.image.dataUrl}
+                        alt={`รูปประกอบ ${item.description || `รายการ ${index + 1}`}`}
+                        data-testid={`item-image-editor-${item.id}`}
+                        className="h-20 w-20 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-2xl text-slate-400">🖼️</div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-slate-800">รูปภาพประกอบรายการ</div>
+                      <div className="mt-0.5 text-[11px] text-slate-500">JPEG / PNG / WebP · ระบบจะย่อและบีบอัดก่อนบันทึก</div>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <label className={`inline-flex cursor-pointer items-center rounded-md border px-2.5 py-1.5 font-semibold transition-colors ${processingItemId === item.id ? 'cursor-wait border-slate-200 bg-slate-100 text-slate-400' : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}>
+                          {processingItemId === item.id ? 'กำลังประมวลผล…' : item.image ? 'เปลี่ยนรูป' : 'แนบรูป'}
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            data-testid={`input-item-image-${item.id}`}
+                            disabled={processingItemId === item.id}
+                            onChange={(event) => {
+                              const file = event.target.files?.[0];
+                              event.target.value = '';
+                              void handleImageFile(item.id, file);
+                            }}
+                            className="sr-only"
+                          />
+                        </label>
+                        {item.image && (
+                          <button type="button" data-testid={`btn-remove-item-image-${item.id}`} onClick={() => { onUpdateItem(item.id, { image: undefined }); clearImageError(item.id); }} className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 font-semibold text-rose-700 hover:bg-rose-100">
+                            ลบรูป
+                          </button>
+                        )}
+                      </div>
+                      {imageErrors[item.id] && <div data-testid={`item-image-error-${item.id}`} className="mt-2 rounded-md bg-rose-50 px-2 py-1.5 text-[11px] font-medium text-rose-700">{imageErrors[item.id]}</div>}
+                    </div>
                   </div>
                 </div>
               )}
