@@ -459,3 +459,36 @@ This addendum intentionally does **not** self-declare Gate 4 PASS because the pr
 > **Implementation remediation complete — ready for independent Gate 4 review.**
 
 No known technical or environment blocker remains for independent Gate 4 review. Gate 4 should be marked PASS only by the designated independent reviewer after reviewing this remediation commit and evidence.
+
+### 9.13 Continuation verification — canonical preview-image assertion (2026-08-25)
+
+This continuation began at existing repository HEAD `d911fc5f30041fe92e8cabf2c2f32027e8be0426` (`Phase 4 remediation: item image persistence pipeline`). That remediation commit already existed before this continuation; no commit or push was performed here.
+
+The remaining stale Phase 3 E2E check was tightened in `tests/e2e/phase3-print.spec.ts`. The `with-images` fixture now verifies both that `preview-item-image-item-1` is visible and that its `src` is a canonical persisted JPEG/WebP data URL matching `^data:image/(jpeg|webp);base64,`. Production code was not changed to satisfy the test.
+
+Current repository verification after that test-only correction:
+
+```text
+pnpm test
+Test Files  9 passed (9)
+Tests       117 passed (117)
+
+pnpm typecheck
+# tsc --noEmit — PASS
+
+pnpm lint
+# eslint . — PASS, 0 errors / 0 warnings
+
+pnpm build
+# Next.js 16.3.1 production build — PASS
+
+pnpm test:e2e
+Running 32 tests using 4 workers
+32 passed (6.7s)
+```
+
+The targeted managed-Chromium run for the corrected Phase 3 scenario also passed `1/1`. The supplemental system-Chrome result remains the previously recorded `32/32`; it was not rerun because the official repository command now passes with Playwright-managed Chromium. `.playwright-system-chrome.config.ts` is absent, and no `.phase4_patch_*` helper remains.
+
+At this continuation's pre-evidence final-diff checkpoint, the only uncommitted file was `tests/e2e/phase3-print.spec.ts` with four inserted assertion lines. The evidence append itself adds this documentation file to the final working-tree diff. `git diff --check` passes. No production, calculation, VAT, WHT, deposit, rounding, tax-invoice eligibility, backend/cloud, Supabase, API route, server database, or PDF-generation file was changed in this continuation.
+
+**Implementation remediation complete — ready for independent Gate 4 review.** This is not a Gate 4 PASS declaration; independent review/signoff remains required.

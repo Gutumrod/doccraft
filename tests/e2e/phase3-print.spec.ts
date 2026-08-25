@@ -181,6 +181,10 @@ test.describe('Phase 3 — A4 Preview + Native Print E2E', () => {
     // 2. With item images fixture
     await page.getByTestId('select-fixture').selectOption('with-images');
     await expect(page.getByTestId('preview-item-image-item-1')).toBeVisible();
+    await expect(page.getByTestId('preview-item-image-item-1')).toHaveAttribute(
+      'src',
+      /^data:image\/(jpeg|webp);base64,/
+    );
   });
 
   test('8. 375px mobile and 768px tablet force document preview visible in print media even from Editor tab', async ({ page }) => {
