@@ -1,7 +1,7 @@
 # DocCraft — Product Requirements Document (PRD)
 
 > **Status:** Authoritative Product Contract — D0 Approved Baseline
-> **Version:** 2.0 Reality-Aligned Draft
+> **Version:** 2.1 Reality-Aligned + V1 Business Logo Amendment
 > **Product:** Browser-first modular business document studio for Thailand
 > **Rule:** If another product document conflicts with this PRD on V1 scope or behavior, this PRD wins until the conflict is explicitly resolved.
 
@@ -48,6 +48,17 @@ interface BusinessProfile {
   branchType?: 'head_office' | 'branch';
   branchNumber?: string;
 }
+
+interface CanonicalBusinessLogo {
+  dataUrl: string;
+  mimeType: 'image/jpeg' | 'image/webp';
+  width: number;
+  height: number;
+}
+
+interface BusinessBranding {
+  logo?: CanonicalBusinessLogo;
+}
 ```
 
 Rules:
@@ -70,6 +81,7 @@ interface DocCraftDocument {
   issueDate: string;
   dueDate?: string;
   business: BusinessProfile;
+  branding?: BusinessBranding;
   customer: CustomerProfile;
   items: LineItem[];
   adjustments: AdjustmentConfig;
@@ -82,6 +94,13 @@ interface DocCraftDocument {
   updatedAt: string;
 }
 ```
+
+V1 branding amendment:
+- `branding` เป็น optional document-level presentation/identity state แยกจาก `BusinessProfile` เพื่อไม่ให้ image payload ปนกับ tax-domain profile
+- `branding.logo` รองรับ single optional logo; `blocks.businessLogo` เป็น presentation visibility flag และการซ่อนต้องไม่ลบ canonical asset ที่ persist ไว้
+- new/migrated documents ให้ `blocks.businessLogo = true`; ถ้าไม่มี `branding.logo` layout ต้องยุบตามธรรมชาติและไม่แสดง placeholder
+- source upload รองรับ PNG/JPEG/WebP แต่ canonical persisted representation ใช้ validated browser-safe JPEG/WebP data URL + dimensions ตาม image pipeline contract
+- V1 ownership เป็นต่อ current document; reusable/shared business-brand profile เป็น Phase 7+ concern หลังมี cloud/profile foundation
 
 ## 6. Calculation Contract
 
@@ -105,6 +124,7 @@ Baseline:
 
 V1 blocks:
 - Business/header
+- Business logo (optional; fixed header placement, preserve aspect ratio, no free-drag/unrestricted resize)
 - Customer
 - Items
 - Item image column (optional)
@@ -142,6 +162,7 @@ Requirements:
 - Import/Export JSON เป็น V1 backup contract
 - Import ต้อง validate schema ก่อน replace state
 - รูปต้อง resize/compress ก่อน persist และมี per-image size guard
+- business logo ต้องใช้ canonical client-side image pipeline เดียวกับหลักความปลอดภัยของ item image เท่าที่เหมาะสม แต่ logo-specific dimension/encoded-size limits ต้องกำหนดแยกและ review ก่อนใช้
 - ถ้า local persistence ล้มเหลว ผู้ใช้ยังต้องสามารถทำเอกสารปัจจุบันต่อและ Export backup ได้
 
 **Excel export ไม่ใช่ V1 backup contract**; monthly/report Excel อยู่ post-MVP
@@ -171,6 +192,7 @@ V1 ไม่ตรวจว่าเงินถูกโอนสำเร็�
 - double-entry accounting / general ledger
 - e-Tax Invoice & e-Receipt integration
 - AI document generation
+- free-form template/page designer, arbitrary logo positioning, multiple logos/watermarks หรือ organization-wide brand kit
 
 ## 12. Post-MVP Capability Buckets
 
@@ -185,7 +207,7 @@ Later candidates หลัง validation:
 - document lifecycle conversion
 - E-Sign/customer approval link
 - monthly Excel reports
-- templates/themes
+- advanced templates/themes (baseline single business logo เป็น V1 capability แล้ว; ข้อนี้หมายถึง customization ที่เกิน fixed logo block)
 - subscription billing
 
 Payment policy: PromptPay may be offered for one-time checkout where supported, but must not be described as an automatic recurring rail. Recurring subscription design requires a payment method/provider flow that explicitly supports recurring charges.
@@ -202,6 +224,7 @@ Payment policy: PromptPay may be offered for one-time checkout where supported, 
 8. Exported JSON can be imported into a clean session and reproduce the document.
 9. PromptPay payload passes known test vectors and invalid identifiers are rejected.
 10. V1 works end-to-end without login, Supabase or payment gateway credentials.
+11. Optional business logo upload/hide/show/refresh/JSON round-trip และ A4 native print ผ่านโดยไม่ทำ accepted logo เดิมหายเมื่อ replacement ล้มเหลว และไม่ทำ header/table เกิด critical clipping หรือ horizontal overflow.
 
 ## 14. Product Claims Guardrail
 

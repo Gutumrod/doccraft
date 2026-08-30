@@ -1,6 +1,6 @@
-﻿# DocCraft — Implementation Plan
+# DocCraft — Implementation Plan
 
-> **Status:** Phase 2 CLOSED — Gate 2 PASS after independent remediation. Phase 3 implementation complete under `BRIEF-phase3-a4-preview-print.md`; automated verification recorded in `PHASE3_IMPLEMENTATION_EVIDENCE.md`. Gate 3 NOT YET PASS — pending independent human review. Phase 4 (Local Persistence + JSON Backup) implementation is also complete; automated verification recorded in `PHASE4_IMPLEMENTATION_EVIDENCE.md`. Gate 4 NOT YET PASS for the same reason. Phase 4 was opened ahead of Gate 3 review by explicit user direction — a deliberate deviation from this document's own sequencing rule, not an oversight. Phase 5 must not open until at least Gate 3 passes independent review.
+> **Status:** Phase 2 CLOSED — Gate 2 PASS after independent remediation. Phase 3 implementation complete under `BRIEF-phase3-a4-preview-print.md`; automated verification recorded in `PHASE3_IMPLEMENTATION_EVIDENCE.md`. Gate 3 NOT YET PASS — pending independent human review. Phase 4 (Local Persistence + JSON Backup) implementation is complete and Gate 4 PASS is independently recorded in `GATE4_INDEPENDENT_REVIEW_2026-08-26.md`. Phase 4 was opened ahead of Gate 3 review by explicit user direction — a deliberate deviation from this document's own sequencing rule, not an oversight. Phase 5 must not open until Gate 3 and the inserted Gate 4.1 are PASS; Gate 4 is already PASS.
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง
@@ -131,6 +131,36 @@
 - corrupted/unknown schema import ถูก reject พร้อม actionable error
 - ไม่มี hard-coded browser quota assumption
 
+## Phase 4.1 — Business Logo / Branding Block
+**เป้าหมาย:** เพิ่ม baseline business identity ให้เอกสาร V1 โดย reuse client-side image safety ที่พิสูจน์แล้ว โดยไม่ขยายเป็น template designer
+
+### งาน
+- extend canonical document schema ด้วย optional document-level `branding.logo` asset และ `blocks.businessLogo` visibility state; keep logo payload out of tax-domain `BusinessProfile`
+- increment schema version from the actual implementation baseline (observed baseline = 2, therefore expected next = 3 if unchanged) and migrate existing documents with `blocks.businessLogo = true` without fabricating a logo
+- schema migration ต้อง preserve existing pre-logo documents ที่ไม่มี logo และไม่ต้องสร้าง placeholder asset
+- source accept PNG/JPEG/WebP; decode/validate client-side และ canonicalize เป็น browser-safe JPEG/WebP asset (`dataUrl`, `mimeType`, `width`, `height`)
+- reuse shared image-processing primitives where safe แต่กำหนด logo-specific dimension/quality/encoded-size constants แยกจาก item image
+- replacement เป็น transactional behavior: invalid/decode/encode/oversize/storage failure ห้ามทำ accepted logo เดิมหาย
+- fixed header placement + aspect-ratio preservation; no drag/drop, arbitrary position, unrestricted resize
+- hide/show ต้องไม่ลบ persisted logo
+- local autosave/restore + JSON export/import round-trip
+- A4 preview/native print ต้องใช้ canonical logo เดียวกันและไม่มี editor controls รั่ว
+
+### Required Tests
+- valid PNG/JPEG/WebP upload → canonical logo
+- malformed/unsupported/oversized source reject โดย preserve logo เดิม
+- hide/show + refresh restore + JSON round-trip
+- schema migration from pre-logo schema document
+- no-logo regression fixture
+- long business header + logo print fixture; no critical clipping/horizontal overflow
+- calculation/tax suites unchanged
+
+### Gate 4.1
+- automated unit/integration/E2E checks ผ่าน
+- reference preview/native print evidence มี logo/no-logo
+- no backend/auth/cloud asset dependency introduced
+- independent reviewer ตรวจ schema migration, failure preservation, persistence round-trip และ print layout จริง
+
 ## Phase 5 — PromptPay QR on Document
 **เป้าหมาย:** เพิ่ม payment instruction ในเอกสาร โดยไม่สร้าง payment collection/billing system
 
@@ -160,6 +190,7 @@
 6. refresh restore → JSON export/import recovery
 7. storage failure while continuing current document
 8. phone/tablet/desktop core loop
+9. business logo upload → hide/show → refresh restore → JSON round-trip → A4 preview/native print, plus no-logo regression
 ### Release Verification
 - automated unit/integration tests
 - lint + typecheck + production build
@@ -193,7 +224,7 @@ entitlement + recurring payment rail ที่รองรับจริง + w
 **Gate:** billing lifecycle และ entitlement transitions ผ่าน integration tests
 
 ## Phase 9 — Validated Post-MVP Capabilities
-quotation→invoice→receipt conversion, Excel/monthly reports, templates/themes, E-Sign/public links เฉพาะรายการที่ผ่าน product validation และมี PRD extension ก่อน
+quotation→invoice→receipt conversion, Excel/monthly reports, advanced templates/themes, E-Sign/public links เฉพาะรายการที่ผ่าน product validation และมี PRD extension ก่อน; single fixed business logo block ไม่อยู่ใน bucket นี้แล้วเพราะถูกย้ายเข้า V1 Phase 4.1
 
 ## Required Evidence Per Phase
 ทุก Phase ต้องทิ้งหลักฐานอย่างน้อย: files changed, commands/tests run, results, manual checks, known limitations, git diff summary และ reviewer verdict (`PASS` / `REMEDIATE`).
@@ -210,3 +241,15 @@ The independent review at `GATE_REVIEW_PHASE3_PHASE4_2026-08-24.md` supersedes a
 - **Phase 5:** `BRIEF-phase5-promptpay-qr.md` is prepared for handoff but remains `PREPARED — NOT OPENED` until both gates are PASS.
 
 No Phase 5 production code may be written under this plan while either remediation remains open.
+
+### Gate 4 Closure — 2026-08-26
+`GATE4_INDEPENDENT_REVIEW_2026-08-26.md` supersedes the Gate 4 remediation status above: **Gate 4 = PASS** at reviewed implementation HEAD `22283a0`, with review hardening commit `42bd70d` and verdict commit `2a8652e`. Gate 3 remains open pending the separate manual native-print acceptance.
+
+## V1 Scope Amendment — Business Logo — 2026-08-28
+Product owner approved the constrained Business Logo capability for V1 after review of `PROPOSAL-business-logo-branding-block.md`. This amendment changes phase sequencing but does not authorize implementation by itself.
+
+- Single optional business logo is now V1 scope under **Phase 4.1 — Business Logo / Branding Block**.
+- Phase 4.1 must remain browser-first and reuse the proven image-safety boundary without silently reusing item-image limits.
+- Advanced templates/themes, arbitrary layout control, multiple logos/watermarks and brand kits remain post-MVP Phase 9 candidates.
+- `BRIEF-phase4.1-business-logo-branding-block.md` must be reviewed before production-code changes.
+- Phase 5 cannot open until all earlier required gates, including Gate 4.1, are PASS.

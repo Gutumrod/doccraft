@@ -1,7 +1,7 @@
 # DocCraft — Product Engineering Roadmap
 
 > **Status:** Execution Contract — D0 Approved Baseline
-> **Version:** 2.0
+> **Version:** 2.1 — V1 Business Logo Amendment
 > **Rule:** Phase ถัดไปเปิดได้เมื่อ phase ปัจจุบันผ่าน acceptance gate และ review แล้วเท่านั้น
 > **D0:** PASS — Phase 1 may proceed under its current execution brief
 > **Execution Detail:** `IMPLEMENTATION_PLAN.md` เป็นแผนปฏิบัติการที่ต้อง map 1:1 กับ Phase 1–9 ของ ROADMAP นี้; งาน Repository Intake เป็น pre-implementation step (`R0`) ไม่ใช่ ROADMAP Phase 0
@@ -48,6 +48,17 @@
 
 **Gate:** refresh restore, corrupted import และ storage failure behavior ผ่าน
 
+## Phase 4.1 — Business Logo / Branding Block
+- optional single business logo in fixed document-header placement
+- source upload PNG/JPEG/WebP; canonical client-side JPEG/WebP persistence with logo-specific dimension/encoded-size guards
+- preserve aspect ratio; no free-drag, arbitrary positioning or unrestricted resize
+- hide/show without deleting stored logo; failed replacement preserves previous accepted logo
+- schema migration + local restore + JSON export/import round-trip
+- A4 preview/native print regression with logo/no-logo fixtures and long business-header content
+- no backend/auth/cloud asset dependency
+
+**Gate:** logo upload/validation/failure recovery/persistence/JSON round-trip/preview/native print tests ผ่าน; documents without logo and calculation/tax suites have no regression; independent review confirms no critical header/table overflow
+
 ## Phase 5 — PromptPay Document QR
 - PromptPay identifier validation
 - EMV payload + CRC tests
@@ -89,12 +100,13 @@ Phase 7 ห้ามเปิดเพียงเพราะ Phase 6 code ผ�
 Candidates only after validation:
 - quotation → invoice → receipt conversion
 - Excel/monthly reports
-- templates/themes
+- advanced templates/themes (single fixed business logo block shipped in V1 Phase 4.1; this candidate covers broader visual customization)
 - E-Sign/public customer links after security/privacy approval
 
 **Gate:** แต่ละ capability ต้องมี PRD extension และ acceptance criteria ก่อน implement
 
 ## Roadmap Policy
+- Phase 4.1 เป็น approved V1 insertion ก่อน Phase 5; Phase 5 ห้ามเปิดจน Gate 4.1 ผ่านตาม sequencing rule
 - ไม่มี fixed sprint/date promise ในเอกสารนี้จนประเมิน repo จริง
 - checkbox/report จาก agent ไม่ใช่หลักฐานการผ่าน
 - pricing หรือ marketing campaign ไม่สามารถเร่ง capability ข้าม gate ได้

@@ -1,7 +1,7 @@
 # DocCraft — System Architecture Specification
 
 > **Status:** Authoritative Architecture Contract — D0 Approved Baseline
-> **Version:** 2.0 Reality-Aligned
+> **Version:** 2.1 Reality-Aligned + V1 Business Logo Amendment
 > **Source of Truth:** Must conform to `PRD.md`
 > **Target:** Browser-first V1, backend optional only in post-MVP phases
 
@@ -37,6 +37,7 @@ Version choices above are pinned from working local toolchains in this repositor
 ```text
 Browser
 ├─ Modular Editor UI
+├─ Business Logo / Item Image Client Pipeline
 ├─ Document Domain + Validation
 ├─ Calculation Engine
 ├─ A4 Preview / Print Styles
@@ -49,12 +50,13 @@ Browser
 ## 3. Domain Boundaries
 
 แยกโมดูลอย่างน้อย:
-- `document-domain`: schema, document types, block visibility
+- `document-domain`: schema, document types, document-level `branding`, block visibility; logo asset state must remain separate from tax-domain `BusinessProfile`
 - `tax-domain`: entity type, VAT registration, tax-invoice validation
 - `calculation`: discounts, VAT, WHT, deposits, rounding
 - `promptpay`: identifier validation, EMV payload, CRC
 - `persistence`: autosave, schema migration, import/export, quota handling
 - `print`: A4 layout and multi-page rules
+- `image`: client-side decode/validate/resize/canonicalize primitives สำหรับ item images และ optional business logo; shared primitives ทำได้ แต่ dimension/quality/encoded-size constants ของ logo ต้องแยกจาก item-image limits
 
 Tax contract:
 - `entityType` และ `vatStatus` เป็นคนละค่า
@@ -74,6 +76,8 @@ Requirements:
 - JSON export ต้องทำได้แม้ local persistence เขียนไม่สำเร็จ
 - import ต้อง validate ก่อน replace state
 - image pipeline ต้อง resize/compress แล้วตรวจ encoded size จริง; ถ้ายังเกิน limit ต้องลดซ้ำหรือ reject พร้อมข้อความชัดเจน
+- optional business logo ใช้ canonical shape ที่เทียบเท่า persisted image asset ปัจจุบัน (`dataUrl`, `mimeType`, `width`, `height`); source PNG/JPEG/WebP ต้องผ่าน decode/validation และ canonical persistence ต้องเป็น JPEG/WebP ที่ผ่าน logo-specific limits
+- hide/show logo เป็น presentation state; ห้ามลบ stored logo โดยอัตโนมัติ และ failed replacement ต้อง preserve accepted logo เดิม
 
 ห้าม hard-code assumption ว่า browser มี LocalStorage 5MB แน่นอน
 ## 5. Print Architecture
@@ -88,6 +92,7 @@ Reference environment: Chrome/Edge desktop
 - รายการยาว
 - ภาษาไทยยาว
 - มี/ไม่มีรูป
+- มี/ไม่มี business logo และ header ที่มีข้อมูลธุรกิจยาว
 
 `break-inside: avoid` เป็น best-effort rule ไม่ใช่ guarantee ว่า pagination จะเหมือนกันทุก browser
 
@@ -119,3 +124,5 @@ Phase 9+: E-Sign/public links ต้องผ่าน privacy/security review �
 ## 9. Explicitly Deferred
 
 Supabase sync, auth, subscription billing, E-Sign, Excel reports, AI, inventory, accounting ledger และ e-Tax integration ไม่อยู่ใน V1 architecture
+
+Advanced templates/themes, free-form layout designer, arbitrary logo positioning, multiple logos/watermarks และ organization-wide brand kit ยัง deferred; V1 รองรับเพียง single optional business logo block แบบ fixed header placement

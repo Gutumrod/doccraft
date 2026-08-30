@@ -257,3 +257,17 @@ What is **not** confirmed:
 - Any independent reviewer reading the actual diff and browser behavior, as `IMPLEMENTATION_PLAN.md` Section 0 requires ("reviewer ตรวจไฟล์จริง, diff จริง, tests จริง; ห้ามเชื่อรายงาน READY/PASSED อย่างเดียว").
 
 **Recommendation:** do not mark Gate 3 PASS in `DOCUMENTATION_READINESS_INDEX.md` or open Phase 4 until a human has walked through Section 6 on real Chrome/Edge and reviewed this evidence directly.
+
+## 11. Gate 3 Manual Acceptance Progress — 2026-08-28
+
+A real desktop Chrome native print dialog was opened and visually inspected for a representative one-page DocCraft document.
+
+Recorded evidence:
+- `docs/evidence/GATE3_ONE_PAGE_NATIVE_PRINT_2026-08-28.png`
+- Native print dialog visibly opened from DocCraft.
+- Preview reported `1/1` page.
+- The printable document sheet showed no editor form controls inside the printed page.
+- No critical clipping or overlap was observed in the visible one-page preview.
+- The environment exposed a PDF-capable print destination (`Microsoft Print to PDF`).
+
+This is **partial Gate 3 evidence only**. The independent Gate 3 requirement also calls for a real multi-page reference-browser print-preview inspection. Until a representative 2+ page fixture is opened in the native print dialog and visually accepted, **Gate 3 remains REMEDIATE / NOT PASS**.
