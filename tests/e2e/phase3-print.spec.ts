@@ -91,6 +91,12 @@ test.describe('Phase 3 — A4 Preview + Native Print E2E', () => {
     const previewDisplay = await previewContainer.evaluate((el) => window.getComputedStyle(el).display);
     expect(previewDisplay).not.toBe('none');
 
+    // Screen-only slate background must never leak into native print output.
+    const appShellBackground = await page.locator('.doccraft-app-shell').evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(appShellBackground).toBe('rgb(255, 255, 255)');
+    const previewBackground = await previewContainer.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(previewBackground).toBe('rgb(255, 255, 255)');
+
     // Switch back to screen
     await page.emulateMedia({ media: 'screen' });
     const headerDisplayScreen = await page.locator('header').evaluate((el) => window.getComputedStyle(el).display);

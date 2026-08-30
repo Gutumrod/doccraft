@@ -77,6 +77,11 @@ html, body {
     overflow: visible !important;
   }
 
+  /* Prevent the screen-only slate app background from leaking into the printed page. */
+  .doccraft-app-shell {
+    background: #ffffff !important;
+  }
+
   /* A4 document preview sheet formatting in print */
   .a4-document-sheet {
     border: none !important;
@@ -85,7 +90,7 @@ html, body {
     margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    background: transparent !important;
+    background: #ffffff !important;
     border-radius: 0 !important;
   }
 

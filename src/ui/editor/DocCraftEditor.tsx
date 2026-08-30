@@ -152,7 +152,7 @@ export function DocCraftEditor() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 pb-20 overflow-x-hidden">
+    <div className="doccraft-app-shell min-h-screen bg-slate-100 text-slate-900 pb-20 overflow-x-hidden">
       {/* Hidden file input for JSON import */}
       <input
         type="file"
