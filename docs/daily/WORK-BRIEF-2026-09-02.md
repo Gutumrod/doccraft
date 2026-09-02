@@ -1,8 +1,10 @@
-﻿# Daily Work Brief - 2026-09-02
+# Daily Work Brief - 2026-09-02
+
+> **SUPERSEDED 2026-09-03.** Its "Current State" no longer holds: the Gate 3 evidence it describes as uncommitted was committed as `ceeb2a1` and pushed on 2026-09-02. Its separation instruction was not followed — `ceeb2a1` absorbed the JSON-control work. Kept as the historical brief; read `docs/CURRENT_STATUS.md` and `docs/daily/2026-09-03.md` for the live state.
 
 **Product:** DocCraft (DC01)
 **Priority / scheduling:** READY AFTER PORTFOLIO GATE
-**Baseline:** $branch @ 1b4be25
+**Baseline:** `master` @ `1b4be25`
 
 ## Current State
 Gate 1, Gate 2 and Gate 4 are closed. Local 2026-09-01 evidence records Gate 3 PASS/CLOSED after native Chrome print remediation and independent review, with 118/118 unit tests and 33/33 E2E. Phase 4.1 Business Logo is unblocked for mandatory intake, but the Gate 3/evidence work and unrelated pre-existing JSON-control changes are still uncommitted in the working tree.
