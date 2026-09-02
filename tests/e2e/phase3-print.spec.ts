@@ -132,6 +132,12 @@ test.describe('Phase 3 — A4 Preview + Native Print E2E', () => {
     await expect(page.getByTestId('preview-block-terms')).toContainText('ใบเสนอราคานี้มีผลบังคับใช้ 30 วัน');
     await expect(page.getByTestId('preview-block-notes')).toContainText('4-6 สัปดาห์');
     await expect(page.getByTestId('preview-block-signatures')).toContainText('ผู้มีอำนาจลงนาม');
+    // Keep the representative one-page fixture within a conservative A4 print-height budget.
+    // Native Chrome/Edge Print Preview remains the final acceptance gate.
+    await page.emulateMedia({ media: 'print' });
+    const printHeight = await preview.evaluate((el) => el.getBoundingClientRect().height);
+    expect(printHeight).toBeLessThanOrEqual(1000);
+    await page.emulateMedia({ media: 'screen' });
   });
 
   test('5. representative multi-page fixture contains all 22 rows with break-avoid rules', async ({ page }) => {

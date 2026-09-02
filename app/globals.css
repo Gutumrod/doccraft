@@ -94,6 +94,48 @@ html, body {
     border-radius: 0 !important;
   }
 
+  /* Keep representative one-page documents inside the native A4 print budget without changing screen layout. */
+  .print-document-header {
+    margin-bottom: 8px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .print-customer-card,
+  .print-payment-card {
+    margin-bottom: 8px !important;
+    padding: 8px !important;
+  }
+
+  .print-items-block,
+  .print-adjustments-block,
+  .print-terms-grid {
+    margin-bottom: 8px !important;
+  }
+
+  .print-items-table th,
+  .print-items-table td {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  .print-adjustments-card,
+  .print-terms-card {
+    padding: 8px !important;
+  }
+
+  .print-adjustments-card > * + * {
+    margin-top: 2px !important;
+  }
+
+  .print-signatures-block {
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+    gap: 12px !important;
+  }
+
+  .print-signature-line {
+    height: 32px !important;
+  }
   /* Pagination & page-break rules */
   .print-avoid-break {
     break-inside: avoid !important;

@@ -2,7 +2,7 @@
 
 > **Phase:** 3 — A4 Preview + Native Print  
 > **Date:** 2026-08-23  
-> **Verdict:** NOT YET GATE-REVIEWED — automated checks pass; independent human review is still required before Gate 3 can be marked PASS. See Section 0.  
+> **Current Status:** GATE 3 PASS / CLOSED — independent final review recorded in `GATE3_INDEPENDENT_FINAL_REVIEW_2026-09-01.md`.
 > **Repository:** `Gutumrod/doccraft`  
 > **GitHub:** `Gutumrod/doccraft`  
 > **Branch:** `master`  
@@ -271,3 +271,26 @@ Recorded evidence:
 - The environment exposed a PDF-capable print destination (`Microsoft Print to PDF`).
 
 This is **partial Gate 3 evidence only**. The independent Gate 3 requirement also calls for a real multi-page reference-browser print-preview inspection. Until a representative 2+ page fixture is opened in the native print dialog and visually accepted, **Gate 3 remains REMEDIATE / NOT PASS**.
+
+## 12. Native Print Closure Evidence — 2026-09-01
+
+Fresh native Chrome inspection on Windows 11 found and remediated a real remaining pagination defect in the representative `one-page` fixture. Before remediation the fixture rendered as `2 sheets`; after a print-only spacing/padding correction it renders as `1 sheet` / `1/1` with all expected content intact.
+
+The representative 22-item multi-page fixture was then inspected through all three native print-preview pages. Rows remained intact across page boundaries, totals/payment/terms/notes/signatures remained visible, the physical page background stayed white, and no editor/application chrome leaked into print.
+
+Fresh post-remediation verification is green: 118/118 unit tests, typecheck, lint, production build, 33/33 Playwright E2E, and `git diff --check`.
+
+Detailed environment, diff boundary and screenshot references are recorded in `GATE3_NATIVE_PRINT_ACCEPTANCE_2026-09-01.md`.
+
+**Disposition:** the technical manual-print closure matrix is complete and the phase is `READY FOR INDEPENDENT FINAL REVIEW`. Per the project gate policy, this remediation session does not self-declare Gate 3 PASS; a separate human reviewer must record the final PASS/REMEDIATE verdict before Phase 4.1 opens.
+
+
+## 13. Independent Final Gate 3 Review — 2026-09-01
+
+Antigravity performed the independent final review required by the Gate 3 contract. The reviewer inspected the current branch/HEAD/dirty tree, Gate 3 remediation diff, unrelated Codex diff separation, all five native Chrome Print Preview screenshots, and reran the required verification commands.
+
+Fresh reviewer verification: 118/118 unit tests PASS; typecheck PASS; lint PASS with 0 errors/warnings; production build PASS; 33/33 Playwright E2E PASS; `git diff --check` PASS with line-ending warnings only.
+
+Severity findings: CRITICAL 0, HIGH 0, MEDIUM 0, LOW 1 informational (unrelated preserved Codex JSON-control changes).
+
+**Final independent verdict: GATE 3 — PASS. Phase 3 is CLOSED.** See `GATE3_INDEPENDENT_FINAL_REVIEW_2026-09-01.md`.

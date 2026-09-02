@@ -194,7 +194,7 @@ export function DocCraftEditor() {
                   </span>
                 )}
               </div>
-              <p className="hidden md:block text-[11px] text-slate-500 truncate">ระบบสร้างเอกสารธุรกิจแบบโมดูลาร์ พิมพ์ A4 และสำรองข้อมูล JSON</p>
+              <p className="hidden md:block text-[11px] text-slate-500 truncate">ระบบสร้างเอกสารธุรกิจแบบโมดูลาร์ พร้อมพิมพ์เอกสาร A4</p>
             </div>
           </div>
 
@@ -240,6 +240,7 @@ export function DocCraftEditor() {
             </button>
 
             <button
+              hidden
               type="button"
               data-testid="btn-import-json"
               onClick={handleImportClick}
@@ -251,6 +252,7 @@ export function DocCraftEditor() {
             </button>
 
             <button
+              hidden
               type="button"
               data-testid="btn-export-json"
               onClick={handleExport}
@@ -489,6 +491,7 @@ export function DocCraftEditor() {
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
+            hidden
             type="button"
             data-testid="btn-mobile-export"
             onClick={handleExport}

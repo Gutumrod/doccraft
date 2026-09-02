@@ -49,7 +49,7 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
       )}
 
       {/* Header Block: Business Info + Document Meta */}
-      <div className="print-avoid-break mb-8 flex flex-col justify-between gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start">
+      <div className="print-document-header print-avoid-break mb-8 flex flex-col justify-between gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start">
         {/* Business Info */}
         {blocks.business ? (
           <div data-testid="preview-block-business" className="space-y-1.5 max-w-sm sm:max-w-md break-words">
@@ -112,7 +112,7 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
 
       {/* Customer Info Block */}
       {blocks.customer && (
-        <div data-testid="preview-block-customer" className="print-avoid-break mb-8 rounded-xl bg-slate-50/80 p-4 border border-slate-200 break-words">
+        <div data-testid="preview-block-customer" className="print-customer-card print-avoid-break mb-8 rounded-xl bg-slate-50/80 p-4 border border-slate-200 break-words">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
             ลูกค้า / ผู้ว่าจ้าง (Customer / Billed To)
           </span>
@@ -141,8 +141,8 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
 
       {/* Items Table Block */}
       {blocks.items && (
-        <div data-testid="preview-block-items" className="mb-8 overflow-x-auto print:overflow-visible">
-          <table className="w-full text-left text-xs border-collapse">
+        <div data-testid="preview-block-items" className="print-items-block mb-8 overflow-x-auto print:overflow-visible">
+          <table className="print-items-table w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b-2 border-slate-300 bg-slate-100/70 text-slate-700 font-bold uppercase text-[11px]">
                 <th className="py-2.5 px-2 w-10 text-center">#</th>
@@ -197,8 +197,8 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
 
       {/* Adjustments & Totals Summary Block */}
       {blocks.adjustments && totals && (
-        <div data-testid="preview-block-adjustments" className="print-avoid-break mb-8 flex flex-col sm:flex-row justify-end">
-          <div className="w-full sm:w-84 space-y-2 rounded-xl bg-slate-50/80 p-4 border border-slate-200 text-xs">
+        <div data-testid="preview-block-adjustments" className="print-adjustments-block print-avoid-break mb-8 flex flex-col sm:flex-row justify-end">
+          <div className="print-adjustments-card w-full sm:w-84 space-y-2 rounded-xl bg-slate-50/80 p-4 border border-slate-200 text-xs">
             <div className="flex justify-between text-slate-700">
               <span>รวมเป็นเงิน (Subtotal):</span>
               <span className="font-mono font-semibold text-slate-950">{totals.subtotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿</span>
@@ -251,7 +251,7 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
 
       {/* Payment Block */}
       {blocks.payment && document.payment.instructions && (
-        <div data-testid="preview-block-payment" className="print-avoid-break mb-8 rounded-xl bg-slate-50/70 p-4 border border-slate-200 break-words">
+        <div data-testid="preview-block-payment" className="print-payment-card print-avoid-break mb-8 rounded-xl bg-slate-50/70 p-4 border border-slate-200 break-words">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
             ข้อมูลการชำระเงิน (Payment Details)
           </span>
@@ -262,9 +262,9 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
       )}
 
       {/* Terms & Notes */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="print-terms-grid mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {blocks.terms && document.terms && (
-          <div data-testid="preview-block-terms" className="print-avoid-break rounded-xl border border-slate-200 p-4 bg-slate-50/50 break-words">
+          <div data-testid="preview-block-terms" className="print-terms-card print-avoid-break rounded-xl border border-slate-200 p-4 bg-slate-50/50 break-words">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
               เงื่อนไขและข้อตกลง (Terms & Conditions)
             </span>
@@ -275,7 +275,7 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
         )}
 
         {blocks.notes && document.notes && (
-          <div data-testid="preview-block-notes" className="print-avoid-break rounded-xl border border-slate-200 p-4 bg-slate-50/50 break-words">
+          <div data-testid="preview-block-notes" className="print-terms-card print-avoid-break rounded-xl border border-slate-200 p-4 bg-slate-50/50 break-words">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
               หมายเหตุ (Notes)
             </span>
@@ -288,14 +288,14 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
 
       {/* Signatures Block */}
       {blocks.signatures && (
-        <div data-testid="preview-block-signatures" className="print-avoid-break mt-8 border-t border-slate-200 pt-8 grid grid-cols-2 gap-8 text-center text-xs text-slate-600">
+        <div data-testid="preview-block-signatures" className="print-signatures-block print-avoid-break mt-8 border-t border-slate-200 pt-8 grid grid-cols-2 gap-8 text-center text-xs text-slate-600">
           <div>
-            <div className="mx-auto mb-2 h-16 w-44 sm:w-52 border-b border-dashed border-slate-400"></div>
+            <div className="print-signature-line mx-auto mb-2 h-16 w-44 sm:w-52 border-b border-dashed border-slate-400"></div>
             <p className="font-semibold text-slate-900">ผู้สั่งซื้อ / ผู้ว่าจ้าง</p>
             <p className="text-[10px] text-slate-500">วันที่: ____ / ____ / ________</p>
           </div>
           <div>
-            <div className="mx-auto mb-2 h-16 w-44 sm:w-52 border-b border-dashed border-slate-400"></div>
+            <div className="print-signature-line mx-auto mb-2 h-16 w-44 sm:w-52 border-b border-dashed border-slate-400"></div>
             <p className="font-semibold text-slate-900">ผู้ออกเอกสาร / ผู้มีอำนาจลงนาม</p>
             <p className="text-[10px] text-slate-500">วันที่: ____ / ____ / ________</p>
           </div>

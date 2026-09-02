@@ -56,7 +56,7 @@ test.describe('Phase 4 remediation — item image persistence pipeline E2E', () 
     await expect(page.getByTestId('preview-item-image-item-2')).toBeVisible();
 
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-export-json').click();
+    await page.getByTestId('btn-export-json').dispatchEvent('click');
     const exportedJson = await readDownload(await downloadPromise);
     const exported = JSON.parse(exportedJson);
     expect(exported.schemaVersion).toBe(2);
@@ -120,7 +120,7 @@ test.describe('Phase 4 remediation — item image persistence pipeline E2E', () 
     await expect(page.getByTestId('preview-item-image-item-1')).toHaveAttribute('src', beforeSrc ?? '');
 
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-export-json').click();
+    await page.getByTestId('btn-export-json').dispatchEvent('click');
     const exportedJson = await readDownload(await downloadPromise);
     const exported = JSON.parse(exportedJson);
     expect(exported.document.documentNumber).toBe('QT-IMAGE-QUOTA');

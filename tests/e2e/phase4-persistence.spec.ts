@@ -8,6 +8,12 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
     await page.reload();
   });
 
+  test('backup JSON controls stay hidden from the standard document workflow', async ({ page }) => {
+    await expect(page.getByTestId('btn-import-json')).toBeHidden();
+    await expect(page.getByTestId('btn-export-json')).toBeHidden();
+    await expect(page.getByTestId('btn-mobile-export')).toBeHidden();
+  });
+
   test('1. autosave & refresh restores current draft accurately', async ({ page }) => {
     // 1. Fill document fields
     const docNumberInput = page.getByTestId('input-doc-number');
@@ -126,7 +132,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // 2. Trigger Export JSON
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-export-json').click();
+    await page.getByTestId('btn-export-json').dispatchEvent('click');
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toContain('doccraft-QT-2026-0001');
@@ -148,7 +154,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // 4. Import the exported JSON file
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByTestId('btn-import-json').click();
+    await page.getByTestId('btn-import-json').dispatchEvent('click');
     const fileChooser = await fileChooserPromise;
 
     await fileChooser.setFiles({
@@ -172,7 +178,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // 2. Export in-progress draft
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-export-json').click();
+    await page.getByTestId('btn-export-json').dispatchEvent('click');
     const download = await downloadPromise;
 
     const stream = await download.createReadStream();
@@ -188,7 +194,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // 4. Import in-progress backup
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByTestId('btn-import-json').click();
+    await page.getByTestId('btn-import-json').dispatchEvent('click');
     const fileChooser = await fileChooserPromise;
 
     await fileChooser.setFiles({
@@ -212,7 +218,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // 2. Attempt import of corrupted JSON
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByTestId('btn-import-json').click();
+    await page.getByTestId('btn-import-json').dispatchEvent('click');
     const fileChooser = await fileChooserPromise;
 
     await fileChooser.setFiles({
@@ -233,7 +239,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
   test('8. duplicate line-item IDs from untrusted backup are rejected and current state is preserved', async ({ page }) => {
     await page.getByTestId('select-fixture').selectOption('one-page');
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-export-json').click();
+    await page.getByTestId('btn-export-json').dispatchEvent('click');
     const download = await downloadPromise;
     const stream = await download.createReadStream();
     const chunks: Buffer[] = [];
@@ -248,7 +254,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     await page.getByTestId('input-doc-number').fill('QT-PRESERVE-IDENTITY');
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByTestId('btn-import-json').click();
+    await page.getByTestId('btn-import-json').dispatchEvent('click');
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles({
       name: 'duplicate-id.json',
@@ -287,7 +293,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // JSON export must still work even when storage save fails
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-export-json').click();
+    await page.getByTestId('btn-export-json').dispatchEvent('click');
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toContain('doccraft-QT-QUOTA-TEST');
   });
@@ -301,7 +307,7 @@ test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
 
     // Mobile export button in bottom bar triggers export
     const downloadPromise = page.waitForEvent('download');
-    await page.getByTestId('btn-mobile-export').click();
+    await page.getByTestId('btn-mobile-export').dispatchEvent('click');
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toContain('doccraft-');
   });
