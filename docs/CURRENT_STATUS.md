@@ -15,13 +15,13 @@ The Gate 3 evidence work is no longer uncommitted: it was committed on 2026-09-0
 ## Blockers / Gates
 **CM01's P0a-C1 blocker closed 2026-09-02.** PR #1 (`fix/cm01-ci-timezone-date-semantics` @ `aeaa750`, TZ pinned to `Asia/Bangkok` for the vitest environment plus a regression guard) was merged to `booking-ticket-module` `main`, and the owning CI is green on `main` by push: run `33670789635` @ `aeaa7506` = success, and run `33671032357` @ `6202108` = success. The prior RED result (`33128547044` @ `ff15819`, 2/61) is superseded.
 
-P0a-C1 itself is reassessed and recorded by the portfolio track in `saas-product-hub`, not by this product. DocCraft does not declare it PASS here. Phase 4.1 implementation still additionally requires mandatory intake/owner confirmation, and is not authorized by the CM01 CI result alone.
+P0a-C1 is **PASS** after independent portfolio reassessment on 2026-09-03. DocCraft is no longer portfolio-foundation blocked. Phase 4.1 still requires mandatory intake/owner confirmation, and the High `OPEN-FINDING-json-backup-controls-2026-09-03.md` must be dispositioned before new implementation so the product contract and shipped UI are not allowed to drift further.
 
 ## Next Authorized / Prepared Action
-Documentation/handoff only. Nothing in DocCraft is authorized to start: Gate 3 closure is committed and pushed, and Phase 4.1 stays gated. After P0a-C1 passes, run Phase 4.1 mandatory intake and present the implementation plan before coding.
+Resolve the JSON backup-controls owner decision first. Then run Phase 4.1 mandatory intake and present the implementation plan before coding. Gate 3 closure is already committed/pushed and must not be repeated.
 
 ## Portfolio Scheduling
-**READY AFTER PORTFOLIO GATE**
+**P0a PASS / OWNER DECISION REQUIRED ON JSON BACKUP CONTROLS**
 
 ## Evidence Basis
 `master` @ `ceeb2a1` (clean tree), which is `1b4be25` plus the committed 2026-09-01 Gate 3 evidence; current readiness index records Gate 3 PASS/CLOSED and Gate 4 PASS. Gate 3 test counts (118/118 unit, 33/33 E2E) are the 2026-09-01 local run and were not rerun by this pass.
