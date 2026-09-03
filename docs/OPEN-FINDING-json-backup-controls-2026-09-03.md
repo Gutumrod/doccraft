@@ -2,8 +2,15 @@
 
 **Product:** DocCraft (DC01)
 **Raised:** 2026-09-03 by Claude (Commander)
-**Status:** OPEN - owner decision required
-**Severity:** High. Shipped behaviour on `master` contradicts three approved documents.
+**Status:** `RESOLVED - owner decision 2026-09-03 (option 2 KEEP)`
+**Severity:** High. Shipped behaviour on `master` originally contradicted three approved documents.
+
+> **Resolution note:** On 2026-09-03 the product owner (คุณฟรี) confirmed the JSON backup UI
+> controls were hidden by **his own instruction** because the JSON backup feature is not in
+> active use. Option 2 (KEEP the hide) was chosen. The decision is recorded in
+> `docs/PRODUCT_DECISIONS.md` as **D-2026-09-03**, and the PRD V1 backup contract, the
+> onboarding flow and the support runbook were amended to match shipped reality. The
+> required owner decision is **made**; no implementation blocker remains from this finding.
 
 ## What shipped
 

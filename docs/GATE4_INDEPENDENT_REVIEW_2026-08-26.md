@@ -197,3 +197,14 @@ Remaining sequencing state:
 - **Gate 3:** REMEDIATE — manual Chrome/Edge native print acceptance still required.
 - **Gate 4:** PASS — closed by this independent re-review.
 - **Phase 5:** remains `PREPARED — NOT OPENED` until Gate 3 is also PASS.
+
+## 9. Addendum — 2026-09-03 (owner-decision interpretation note)
+
+This Gate 4 re-review was conducted (2026-08-26) with the JSON Export/Import controls reachable
+from the standard UI. On 2026-09-03 the owner decided (option 2 KEEP, recorded as
+`docs/PRODUCT_DECISIONS.md` D-2026-09-03) to keep the JSON backup UI controls hidden, repositioning
+JSON Import/Export as a capability-held-but-not-exposed in V1. The historical Gate 4 **PASS verdict
+is not changed**; it is now interpreted against the amended contract, where JSON export/import is
+not a V1 customer-facing backup contract. The schema round-trip, migration and quota-failure
+behavior reviewed by Gate 4 remain intact in the source and are still exercised by the persistence
+test suite (E2E drives the hidden controls via `dispatchEvent`).

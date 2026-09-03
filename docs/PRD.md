@@ -159,11 +159,11 @@ Requirements:
 - autosave current draft locally
 - schema versioning สำหรับ migration
 - quota/storage errors ต้องจับและแจ้งผู้ใช้ ห้าม silent data loss
-- Import/Export JSON เป็น V1 backup contract
+- Import/Export JSON เป็น capability ที่มีอยู่แต่ **ไม่ใช่ V1 customer-facing backup contract** — ตาม owner decision D-2026-09-03 UI controls ถูกซ่อนไว้ (capability-held-but-not-exposed) และจะ surface ใน phase หลังหรือเป็น paid/deferred capability
 - Import ต้อง validate schema ก่อน replace state
 - รูปต้อง resize/compress ก่อน persist และมี per-image size guard
 - business logo ต้องใช้ canonical client-side image pipeline เดียวกับหลักความปลอดภัยของ item image เท่าที่เหมาะสม แต่ logo-specific dimension/encoded-size limits ต้องกำหนดแยกและ review ก่อนใช้
-- ถ้า local persistence ล้มเหลว ผู้ใช้ยังต้องสามารถทำเอกสารปัจจุบันต่อและ Export backup ได้
+- ถ้า local persistence ล้มเหลว ผู้ใช้ยังต้องสามารถทำเอกสารปัจจุบันต่อได้ โดยรักษา in-memory state (ตาม D-2026-09-03, Export JSON ไม่เป็น path ผู้ใช้เข้าถึงได้ใน V1 — capability ยังมีแต่ไม่ถูก expose ใน UI)
 
 **Excel export ไม่ใช่ V1 backup contract**; monthly/report Excel อยู่ post-MVP
 
