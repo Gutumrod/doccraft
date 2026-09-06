@@ -17,6 +17,7 @@ export const onePageQuotationFixture: DocCraftDocument = {
     address: '123/45 อาคารเอ็กซิม ชั้น 12 ถนนพญาไท แขวงทุ่งพญาไท เขตราชเทวี กรุงเทพมหานคร 10400',
     branchType: 'head_office',
   },
+  branding: {},
   customer: {
     displayName: 'บริษัท นวัตกรรมดิจิทัล สากล จำกัด',
     taxId: '0105561098765',
@@ -62,6 +63,7 @@ export const onePageQuotationFixture: DocCraftDocument = {
   },
   blocks: {
     business: true,
+    businessLogo: true,
     customer: true,
     items: true,
     itemImages: false,
@@ -95,6 +97,7 @@ export const multiPageDocumentFixture: DocCraftDocument = {
     address: '888/99 หมู่ที่ 4 นิคมอุตสาหกรรมบางปู ซอย 12 ถนนสุขุมวิท ตำบลแพรกษา อำเภอเมืองสมุทรปราการ จังหวัดสมุทรปราการ 10280',
     branchType: 'head_office',
   },
+  branding: {},
   customer: {
     displayName: 'บริษัท กรุงเทพ พัฒนาอสังหาริมทรัพย์ จำกัด',
     taxId: '0105549087654',
@@ -126,6 +129,7 @@ export const multiPageDocumentFixture: DocCraftDocument = {
   },
   blocks: {
     business: true,
+    businessLogo: true,
     customer: true,
     items: true,
     itemImages: false,
@@ -157,6 +161,7 @@ export const richThaiTextFixture: DocCraftDocument = {
     taxId: '1100400123456',
     address: '45/89 หมู่บ้านเศรษฐศิลป์ วิลเลจ ซอยสุขุมวิท 101/1 แขวงบางจาก เขตพระโขนง กรุงเทพมหานคร 10260',
   },
+  branding: {},
   customer: {
     displayName: 'คุณหญิงประไพศรี วรเวชชานนท์ประเสริฐสุข',
     taxId: '3100200987654',
@@ -189,6 +194,7 @@ export const richThaiTextFixture: DocCraftDocument = {
   },
   blocks: {
     business: true,
+    businessLogo: true,
     customer: true,
     items: true,
     itemImages: false,
@@ -222,6 +228,7 @@ export const longCustomerAndAddressFixture: DocCraftDocument = {
     address: '999/888 อาคารอินฟินิตี้ทาวเวอร์ คอมเพล็กซ์เซ็นเตอร์ ชั้น 45 โซนซี ถนนวิภาวดีรังสิต แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร 10900 โทรศัพท์ 0-2123-4567 ต่อ 8901 อีเมล contact@siamenterpriseinnovationglobal.co.th',
     branchType: 'head_office',
   },
+  branding: {},
   customer: {
     displayName: 'บริษัท ซูเปอร์พรีเมียมโกลบอลโลจิสติกส์อินเตอร์เนชั่นแนลเทรดดิ้งแอนด์ทรานสปอร์ตเตชั่นเซอร์วิสเซส (ประเทศไทย) จำกัด',
     taxId: '0105562099999',
@@ -253,6 +260,7 @@ export const longCustomerAndAddressFixture: DocCraftDocument = {
   },
   blocks: {
     business: true,
+    businessLogo: true,
     customer: true,
     items: true,
     itemImages: false,
@@ -302,6 +310,7 @@ export const minimalBlocksFixture: DocCraftDocument = {
   id: 'doc-fixture-minimal-blocks',
   blocks: {
     business: true,
+    businessLogo: true,
     customer: false,
     items: true,
     itemImages: false,

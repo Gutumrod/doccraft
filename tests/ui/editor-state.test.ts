@@ -192,6 +192,67 @@ describe('Editor State & Initial Document', () => {
     expect(eligibility.isEligible).toBe(false);
   });
 
+  it('7a. standard document numbers keep their suffix and sync prefix with document type', () => {
+    let doc = createInitialDocument();
+    expect(doc.documentNumber).toBe('QT-0001');
+
+    doc = setDocumentType(doc, 'invoice');
+    expect(doc.documentNumber).toBe('INV-0001');
+
+    doc = updateDocumentHeader(doc, { documentNumber: 'INV-0099' });
+    doc = setDocumentType(doc, 'receipt');
+    expect(doc.documentNumber).toBe('RC-0099');
+
+    doc = updateDocumentHeader(doc, { documentNumber: 'RC-1234' });
+    doc = setDocumentType(doc, 'work_order');
+    expect(doc.documentNumber).toBe('WO-1234');
+
+    doc = updateDocumentHeader(doc, { documentNumber: 'WO-77' });
+    doc = setDocumentType(doc, 'quotation');
+    expect(doc.documentNumber).toBe('QT-77');
+  });
+
+  it('7b. custom document numbers are never overwritten by document type changes', () => {
+    let doc = createInitialDocument();
+    doc = updateDocumentHeader(doc, { documentNumber: 'KMO-2026-091' });
+    doc = setDocumentType(doc, 'work_order');
+
+    expect(doc.documentType).toBe('work_order');
+    expect(doc.documentNumber).toBe('KMO-2026-091');
+  });
+
+  it('7c. tax-invoice prefix changes only after eligibility passes and auto-downgrades stay consistent', () => {
+    let doc = createInitialDocument();
+    doc = updateDocumentHeader(doc, { documentNumber: 'INV-0050' });
+    doc = setDocumentType(doc, 'invoice');
+
+    const rejected = setDocumentType(doc, 'tax_invoice');
+    expect(rejected.documentType).toBe('invoice');
+    expect(rejected.documentNumber).toBe('INV-0050');
+
+    doc = updateBusinessProfile(doc, {
+      vatStatus: 'registered',
+      taxId: '1234567890123',
+      branchType: 'head_office',
+    });
+    doc = updateAdjustments(doc, { vat: { enabled: true } });
+    doc = setDocumentType(doc, 'tax_invoice');
+    expect(doc.documentType).toBe('tax_invoice');
+    expect(doc.documentNumber).toBe('TAX-0050');
+
+    doc = updateAdjustments(doc, { vat: { enabled: false } });
+    expect(doc.documentType).toBe('invoice');
+    expect(doc.documentNumber).toBe('INV-0050');
+
+    doc = updateAdjustments(doc, { vat: { enabled: true } });
+    doc = setDocumentType(doc, 'tax_invoice');
+    expect(doc.documentNumber).toBe('TAX-0050');
+
+    doc = updateBusinessProfile(doc, { vatStatus: 'not_registered' });
+    expect(doc.documentType).toBe('invoice');
+    expect(doc.documentNumber).toBe('INV-0050');
+  });
+
   it('8. updateCustomerProfile and updateDocumentHeader update fields immutably', () => {
     let doc = createInitialDocument();
     doc = updateCustomerProfile(doc, {

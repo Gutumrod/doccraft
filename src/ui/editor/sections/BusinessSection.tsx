@@ -1,15 +1,31 @@
+/* eslint-disable @next/next/no-img-element -- Canonical business logos are client-processed data URLs and must render unchanged. */
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import type { BusinessLogo } from '../../../domain/document/types';
 import type { BusinessProfile } from '../../../domain/tax/types';
+import { processBusinessLogoFile } from '../../../image/business-logo';
 
 interface BusinessSectionProps {
   business: BusinessProfile;
   onUpdateBusiness: (patch: Partial<BusinessProfile>) => void;
+  logo?: BusinessLogo;
+  showLogo: boolean;
+  onUpdateLogo: (logo: BusinessLogo | undefined) => void;
   isVisible: boolean;
 }
 
-export function BusinessSection({ business, onUpdateBusiness, isVisible }: BusinessSectionProps) {
+export function BusinessSection({
+  business,
+  onUpdateBusiness,
+  logo,
+  showLogo,
+  onUpdateLogo,
+  isVisible,
+}: BusinessSectionProps) {
+  const [processing, setProcessing] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
+
   if (!isVisible) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-500 flex items-center justify-between">
@@ -18,9 +34,80 @@ export function BusinessSection({ business, onUpdateBusiness, isVisible }: Busin
     );
   }
 
+  const clearLogoError = () => setLogoError(null);
+
+  const handleLogoFile = async (file?: File) => {
+    if (!file) return;
+    clearLogoError();
+    setProcessing(true);
+    try {
+      const processed = await processBusinessLogoFile(file);
+      // Invariant: only replace the accepted logo after a successful, validated
+      // encode; a failed replacement keeps the previously accepted logo.
+      onUpdateLogo(processed);
+    } catch (error) {
+      setLogoError(error instanceof Error ? error.message : 'ประมวลผลโลโก้ไม่สำเร็จ');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
       <h2 className="mb-4 text-base font-semibold text-slate-900">2. ข้อมูลผู้ออกเอกสาร (Business Profile)</h2>
+
+      {/* Business Logo */}
+      {showLogo && (
+        <div className="mb-4 rounded-lg border border-dashed border-slate-300 bg-white p-3 text-xs text-slate-600" data-testid="business-logo-editor">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {logo ? (
+              <img
+                src={logo.dataUrl}
+                alt="โลโก้ธุรกิจ"
+                data-testid="business-logo-editor-preview"
+                className="h-16 w-16 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
+              />
+            ) : (
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-2xl text-slate-400">🏷️</div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="font-medium text-slate-800">โลโก้ธุรกิจ (Business Logo)</div>
+              <div className="mt-0.5 text-[11px] text-slate-500">PNG / JPEG / WebP · แสดงมุมซ้ายบนของหัวเอกสาร · ระบบย่อและบีบอัดก่อนบันทึก</div>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <label className={`inline-flex cursor-pointer items-center rounded-md border px-2.5 py-1.5 font-semibold transition-colors ${processing ? 'cursor-wait border-slate-200 bg-slate-100 text-slate-400' : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}>
+                  {processing ? 'กำลังประมวลผล…' : logo ? 'เปลี่ยนโลโก้' : 'อัปโหลดโลโก้'}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    data-testid="input-business-logo"
+                    disabled={processing}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      event.target.value = '';
+                      void handleLogoFile(file);
+                    }}
+                    className="sr-only"
+                  />
+                </label>
+                {logo && (
+                  <button
+                    type="button"
+                    data-testid="btn-remove-business-logo"
+                    onClick={() => {
+                      onUpdateLogo(undefined);
+                      clearLogoError();
+                    }}
+                    className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 font-semibold text-rose-700 hover:bg-rose-100"
+                  >
+                    ลบโลโก้
+                  </button>
+                )}
+              </div>
+              {logoError && <div data-testid="business-logo-error" className="mt-2 rounded-md bg-rose-50 px-2 py-1.5 text-[11px] font-medium text-rose-700">{logoError}</div>}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Entity Type & VAT Status */}
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

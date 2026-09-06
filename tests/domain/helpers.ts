@@ -20,6 +20,7 @@ export function makeDocument(): DocCraftDocument {
       displayName: 'Demo Customer',
       address: 'Bangkok',
     },
+    branding: {},
     items: [
       {
         id: 'line-1',
@@ -38,6 +39,7 @@ export function makeDocument(): DocCraftDocument {
     payment: {},
     blocks: {
       business: true,
+      businessLogo: true,
       customer: true,
       items: true,
       itemImages: true,

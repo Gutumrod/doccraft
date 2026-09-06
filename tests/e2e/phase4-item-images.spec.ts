@@ -40,14 +40,14 @@ test.describe('Phase 4 remediation — item image persistence pipeline E2E', () 
       const raw = window.localStorage.getItem('doccraft_current_draft_v1');
       if (!raw) return false;
       const envelope = JSON.parse(raw);
-      return envelope.schemaVersion === 2
-        && envelope.document.schemaVersion === 2
+      return envelope.schemaVersion === 3
+        && envelope.document.schemaVersion === 3
         && typeof envelope.document.items?.[0]?.image?.dataUrl === 'string'
         && typeof envelope.document.items?.[1]?.image?.dataUrl === 'string';
     });
 
     const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem('doccraft_current_draft_v1') ?? '{}'));
-    expect(stored.schemaVersion).toBe(2);
+    expect(stored.schemaVersion).toBe(3);
     expect(stored.document.items[0].image.width).toBeLessThanOrEqual(960);
     expect(stored.document.items[0].image.height).toBeLessThanOrEqual(960);
 
@@ -59,7 +59,7 @@ test.describe('Phase 4 remediation — item image persistence pipeline E2E', () 
     await page.getByTestId('btn-export-json').dispatchEvent('click');
     const exportedJson = await readDownload(await downloadPromise);
     const exported = JSON.parse(exportedJson);
-    expect(exported.schemaVersion).toBe(2);
+    expect(exported.schemaVersion).toBe(3);
     expect(exported.document.items[0].image.dataUrl).toMatch(/^data:image\/(webp|jpeg);base64,/);
 
     await page.getByTestId('btn-new-document').click();

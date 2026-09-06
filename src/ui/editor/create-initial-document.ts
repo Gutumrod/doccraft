@@ -21,6 +21,7 @@ export function createInitialDocument(): DocCraftDocument {
       branchType: undefined,
       branchNumber: '',
     },
+    branding: {},
     customer: {
       displayName: '[กรอกชื่อลูกค้า / ผู้ว่าจ้าง]',
       taxId: '',
@@ -50,6 +51,7 @@ export function createInitialDocument(): DocCraftDocument {
     payment: {},
     blocks: {
       business: true,
+      businessLogo: true,
       customer: true,
       items: true,
       itemImages: false,

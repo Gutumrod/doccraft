@@ -50,9 +50,17 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
 
       {/* Header Block: Business Info + Document Meta */}
       <div className="print-document-header print-avoid-break mb-8 flex flex-col justify-between gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start">
-        {/* Business Info */}
+        {/* Business Info + Logo */}
         {blocks.business ? (
           <div data-testid="preview-block-business" className="space-y-1.5 max-w-sm sm:max-w-md break-words">
+            {blocks.businessLogo && document.branding.logo && (
+              <img
+                src={document.branding.logo.dataUrl}
+                alt={`โลโก้ ${business.displayName || 'ธุรกิจ'}`}
+                data-testid="preview-business-logo"
+                className="business-logo-preview mb-2 h-16 max-w-40 object-contain print:mb-1 print:object-contain"
+              />
+            )}
             <h1 className="text-xl font-bold tracking-tight text-slate-950 break-words">
               {business.displayName || '(ยังไม่ระบุชื่อผู้ออกเอกสาร)'}
             </h1>

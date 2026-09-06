@@ -1,6 +1,6 @@
 import type { BusinessProfile, VatConfig } from '../tax/types';
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export const DOCUMENT_TYPES = [
   'quotation',
@@ -30,6 +30,17 @@ export interface ItemImage {
   mimeType: 'image/jpeg' | 'image/webp';
   width: number;
   height: number;
+}
+
+export interface BusinessLogo {
+  dataUrl: string;
+  mimeType: 'image/jpeg' | 'image/webp';
+  width: number;
+  height: number;
+}
+
+export interface BrandingConfig {
+  logo?: BusinessLogo;
 }
 
 export interface LineItem {
@@ -65,6 +76,7 @@ export interface PaymentConfig {
 
 export interface BlockVisibility {
   business: boolean;
+  businessLogo: boolean;
   customer: boolean;
   items: boolean;
   itemImages: boolean;
@@ -82,6 +94,7 @@ export interface DocCraftDocument {
   issueDate: string;
   dueDate?: string;
   business: BusinessProfile;
+  branding: BrandingConfig;
   customer: CustomerProfile;
   items: LineItem[];
   adjustments: AdjustmentConfig;

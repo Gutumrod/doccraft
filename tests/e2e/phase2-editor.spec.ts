@@ -28,6 +28,22 @@ test.describe('Phase 2 — DocCraft Editor + Modular Blocks E2E', () => {
     await expect(page.getByTestId('preview-block-customer')).toContainText('บริษัท ผู้ว่าจ้างชั้นนำ จำกัด');
   });
 
+  test('1a. standard document number prefix follows type while custom numbering is preserved', async ({ page }) => {
+    const docNumberInput = page.getByTestId('input-doc-number');
+
+    await page.getByTestId('doc-type-work_order').click();
+    await expect(docNumberInput).toHaveValue('WO-0001');
+    await expect(page.getByTestId('preview-doc-number')).toHaveText('WO-0001');
+
+    await page.getByTestId('doc-type-invoice').click();
+    await expect(docNumberInput).toHaveValue('INV-0001');
+
+    await docNumberInput.fill('KMO-2026-091');
+    await page.getByTestId('doc-type-receipt').click();
+    await expect(docNumberInput).toHaveValue('KMO-2026-091');
+    await expect(page.getByTestId('preview-doc-number')).toHaveText('KMO-2026-091');
+  });
+
   test('2. add a second line, apply discount and see live totals update', async ({ page }) => {
     // Start from an explicit zero-value placeholder, then enter a real amount.
     await expect(page.getByTestId('summary-subtotal')).toContainText('0.00');
@@ -85,6 +101,8 @@ test.describe('Phase 2 — DocCraft Editor + Modular Blocks E2E', () => {
 
     await expect(page.getByTestId('document-preview-container')).toContainText('ใบกำกับภาษี');
     await expect(page.getByTestId('document-preview-container')).toContainText('TAX INVOICE');
+    await expect(page.getByTestId('input-doc-number')).toHaveValue('TAX-0001');
+    await expect(page.getByTestId('preview-doc-number')).toHaveText('TAX-0001');
     await expect(page.getByTestId('summary-vat-amount')).toContainText('70.00');
   });
 

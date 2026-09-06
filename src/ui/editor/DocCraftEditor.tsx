@@ -24,6 +24,7 @@ import {
   setDocumentType,
   toggleWhtBasisItem,
   updateAdjustments,
+  updateBusinessLogo,
   updateBusinessProfile,
   updateCustomerProfile,
   updateDocumentHeader,
@@ -403,6 +404,9 @@ export function DocCraftEditor() {
               business={doc.business}
               isVisible={doc.blocks.business}
               onUpdateBusiness={(patch) => setDoc((d) => updateBusinessProfile(d, patch))}
+              logo={doc.branding.logo}
+              showLogo={doc.blocks.businessLogo}
+              onUpdateLogo={(logo) => setDoc((d) => updateBusinessLogo(d, logo))}
             />
 
             {/* 3. Customer Profile */}

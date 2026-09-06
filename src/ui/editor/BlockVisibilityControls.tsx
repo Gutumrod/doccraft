@@ -10,6 +10,7 @@ interface BlockVisibilityControlsProps {
 
 const BLOCK_CONFIGS: { key: keyof BlockVisibility; label: string; description: string }[] = [
   { key: 'business', label: 'ข้อมูลผู้ออกเอกสาร', description: 'ชื่อผู้ประกอบการ ที่อยู่ เลขประจำตัวผู้เสียภาษี' },
+  { key: 'businessLogo', label: 'โลโก้ธุรกิจ', description: 'แสดงโลโก้บริษัท/ร้านค้าที่หัวเอกสาร' },
   { key: 'customer', label: 'ข้อมูลลูกค้า', description: 'ชื่อลูกค้า/บริษัท ที่อยู่จัดส่ง/วางบิล' },
   { key: 'items', label: 'ตารางรายการสินค้า', description: 'รายการ จำนวน ราคา ส่วนลดรายบรรทัด' },
   { key: 'itemImages', label: 'รูปภาพสินค้า', description: 'รูปภาพประกอบรายการสินค้า/งานบริการ' },

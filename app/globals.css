@@ -94,6 +94,14 @@ html, body {
     border-radius: 0 !important;
   }
 
+  /* Keep business branding legible in native print while preserving a bounded header footprint. */
+  .business-logo-preview {
+    height: 40px !important;
+    max-width: 160px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+  }
+
   /* Keep representative one-page documents inside the native A4 print budget without changing screen layout. */
   .print-document-header {
     margin-bottom: 8px !important;

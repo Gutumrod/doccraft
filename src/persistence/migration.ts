@@ -3,10 +3,15 @@ import { createPersistenceError } from './errors';
 import { CURRENT_STORAGE_FORMAT_VERSION, type PersistenceResult } from './types';
 import { validateCanonicalDocument } from './validation';
 
-const LEGACY_SCHEMA_VERSION = 1;
+const LEGACY_SCHEMA_VERSION_1 = 1;
+const LEGACY_SCHEMA_VERSION_2 = 2;
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean';
 }
 
 function unsupportedSchema(version: unknown, label: string): PersistenceResult<DocCraftDocument> {
@@ -14,9 +19,53 @@ function unsupportedSchema(version: unknown, label: string): PersistenceResult<D
     ok: false,
     error: createPersistenceError(
       'UNSUPPORTED_SCHEMA_VERSION',
-      `Unsupported ${label} schema version: ${String(version)} (supported: ${LEGACY_SCHEMA_VERSION} or ${CURRENT_SCHEMA_VERSION})`,
+      `Unsupported ${label} schema version: ${String(version)} (supported: ${LEGACY_SCHEMA_VERSION_1}, ${LEGACY_SCHEMA_VERSION_2} or ${CURRENT_SCHEMA_VERSION})`,
     ),
   };
+}
+
+/**
+ * Upgrade a migrated document to the current schema (v3). Phases 4.1 adds a
+ * document-level `branding` config and a `blocks.businessLogo` show/hide flag.
+ * Existing documents that never had a logo must default businessLogo to true and
+ * start with an empty branding config, matching the accepted-logo defaults for new
+ * documents.
+ */
+function upgradeToCurrentSchema(
+  rawDocument: Record<string, unknown>,
+  label: string,
+): PersistenceResult<DocCraftDocument> {
+  if (rawDocument.schemaVersion !== LEGACY_SCHEMA_VERSION_2) {
+    return {
+      ok: false,
+      error: createPersistenceError(
+        'ENVELOPE_VALIDATION_FAILED',
+        `Version mismatch: ${label} schemaVersion (${String(rawDocument.schemaVersion)}) does not match expected v2 before upgrade`,
+      ),
+    };
+  }
+
+  const blocks = rawDocument.blocks;
+  if (!isObject(blocks)) {
+    return {
+      ok: false,
+      error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', `Legacy document blocks must be an object (${label})`),
+    };
+  }
+
+  const migratedDocument: Record<string, unknown> = {
+    ...rawDocument,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    branding: {},
+    blocks: {
+      ...blocks,
+      businessLogo: isBoolean(blocks.businessLogo)
+        ? blocks.businessLogo
+        : true,
+    },
+  };
+
+  return validateCanonicalDocument(migratedDocument);
 }
 
 function migrateDocument(
@@ -38,7 +87,11 @@ function migrateDocument(
     return validateCanonicalDocument(rawDocument);
   }
 
-  if (envelopeSchemaVersion !== LEGACY_SCHEMA_VERSION) {
+  if (envelopeSchemaVersion === LEGACY_SCHEMA_VERSION_2) {
+    return upgradeToCurrentSchema(rawDocument, label);
+  }
+
+  if (envelopeSchemaVersion !== LEGACY_SCHEMA_VERSION_1) {
     return unsupportedSchema(envelopeSchemaVersion, label);
   }
 
@@ -61,13 +114,14 @@ function migrateDocument(
       };
     }
   }
-  const migratedDocument: Record<string, unknown> = {
+
+  const migratedV2: Record<string, unknown> = {
     ...rawDocument,
-    schemaVersion: CURRENT_SCHEMA_VERSION,
+    schemaVersion: LEGACY_SCHEMA_VERSION_2,
     items: rawDocument.items.map((item) => (isObject(item) ? { ...item } : item)),
   };
 
-  return validateCanonicalDocument(migratedDocument);
+  return upgradeToCurrentSchema(migratedV2, label);
 }
 
 function validateEnvelopeBase(
@@ -134,7 +188,11 @@ export function migratePersistedEnvelope(rawPayload: unknown): PersistenceResult
   if (!envelope.ok) return envelope;
 
   const schemaVersion = envelope.value.schemaVersion as number;
-  if (schemaVersion !== LEGACY_SCHEMA_VERSION && schemaVersion !== CURRENT_SCHEMA_VERSION) {
+  if (
+    schemaVersion !== LEGACY_SCHEMA_VERSION_1 &&
+    schemaVersion !== LEGACY_SCHEMA_VERSION_2 &&
+    schemaVersion !== CURRENT_SCHEMA_VERSION
+  ) {
     return unsupportedSchema(schemaVersion, 'storage');
   }
 
@@ -160,7 +218,11 @@ export function migrateExportEnvelope(rawPayload: unknown): PersistenceResult<Do
   }
 
   const schemaVersion = envelope.value.schemaVersion as number;
-  if (schemaVersion !== LEGACY_SCHEMA_VERSION && schemaVersion !== CURRENT_SCHEMA_VERSION) {
+  if (
+    schemaVersion !== LEGACY_SCHEMA_VERSION_1 &&
+    schemaVersion !== LEGACY_SCHEMA_VERSION_2 &&
+    schemaVersion !== CURRENT_SCHEMA_VERSION
+  ) {
     return unsupportedSchema(schemaVersion, 'backup');
   }
 

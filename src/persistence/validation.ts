@@ -2,12 +2,14 @@ import {
   CURRENT_SCHEMA_VERSION,
   DOCUMENT_TYPES,
   type BlockVisibility,
+  type BrandingConfig,
   type DepositConfig,
   type DiscountConfig,
   type DocCraftDocument,
   type LineItem,
 } from '../domain/document/types';
 import type { BranchType, EntityType, VatStatus } from '../domain/tax/types';
+import { validateBusinessLogoStructure } from '../image/business-logo';
 import { validateItemImageStructure } from '../image/item-image';
 import { createPersistenceError } from './errors';
 import type { PersistenceResult } from './types';
@@ -105,12 +107,38 @@ function validateLineItem(raw: unknown, index: number): PersistenceResult<LineIt
   };
 }
 
+function validateBranding(raw: unknown): PersistenceResult<BrandingConfig> {
+  if (!isObject(raw)) {
+    return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'branding must be an object') };
+  }
+  const keys = Object.keys(raw).sort();
+  const allowed = ['logo'];
+  if (keys.some((key) => !allowed.includes(key))) {
+    return {
+      ok: false,
+      error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', `branding contains unsupported field: ${keys.join(', ')}`),
+    };
+  }
+  if (raw.logo !== undefined) {
+    const logoRes = validateBusinessLogoStructure(raw.logo);
+    if (!logoRes.ok) {
+      return {
+        ok: false,
+        error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', `branding.logo: ${logoRes.message}`),
+      };
+    }
+    return { ok: true, value: { logo: logoRes.value } };
+  }
+  return { ok: true, value: {} };
+}
+
 function validateBlockVisibility(raw: unknown): PersistenceResult<BlockVisibility> {
   if (!isObject(raw)) {
     return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'blocks must be an object') };
   }
   const requiredKeys: (keyof BlockVisibility)[] = [
     'business',
+    'businessLogo',
     'customer',
     'items',
     'itemImages',
@@ -131,6 +159,7 @@ function validateBlockVisibility(raw: unknown): PersistenceResult<BlockVisibilit
     ok: true,
     value: {
       business: raw.business as boolean,
+      businessLogo: raw.businessLogo as boolean,
       customer: raw.customer as boolean,
       items: raw.items as boolean,
       itemImages: raw.itemImages as boolean,
@@ -308,6 +337,10 @@ export function validateCanonicalDocument(raw: unknown): PersistenceResult<DocCr
     return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.instructions must be a string if provided') };
   }
 
+  // 7a. Branding (Phase 4.1 business logo)
+  const brandingRes = validateBranding(raw.branding);
+  if (!brandingRes.ok) return brandingRes;
+
   // 8. Blocks
   const blocksRes = validateBlockVisibility(raw.blocks);
   if (!blocksRes.ok) return blocksRes;
@@ -342,6 +375,7 @@ export function validateCanonicalDocument(raw: unknown): PersistenceResult<DocCr
       branchType: raw.customer.branchType as BranchType | undefined,
       branchNumber: raw.customer.branchNumber,
     },
+    branding: brandingRes.value,
     items: validatedItems,
     adjustments: {
       documentDiscount: docDiscountRes.value,

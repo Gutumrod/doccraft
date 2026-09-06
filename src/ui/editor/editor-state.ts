@@ -1,6 +1,8 @@
 import type {
   AdjustmentConfig,
   BlockVisibility,
+  BrandingConfig,
+  BusinessLogo,
   CustomerProfile,
   DocCraftDocument,
   DocumentType,
@@ -9,6 +11,22 @@ import type {
 } from '../../domain/document/types';
 import type { BusinessProfile } from '../../domain/tax/types';
 import { validateTaxInvoiceEligibility } from '../../domain/tax/validation';
+
+const DOCUMENT_NUMBER_PREFIXES: Record<DocumentType, string> = {
+  quotation: 'QT',
+  invoice: 'INV',
+  receipt: 'RC',
+  work_order: 'WO',
+  tax_invoice: 'TAX',
+};
+
+const MANAGED_DOCUMENT_NUMBER_PATTERN = /^(QT|INV|RC|WO|TAX)-(.+)$/;
+
+function syncManagedDocumentNumber(documentNumber: string, documentType: DocumentType): string {
+  const match = MANAGED_DOCUMENT_NUMBER_PATTERN.exec(documentNumber);
+  if (!match) return documentNumber;
+  return `${DOCUMENT_NUMBER_PREFIXES[documentType]}-${match[2]}`;
+}
 
 export function updateDocumentHeader(
   doc: DocCraftDocument,
@@ -48,6 +66,10 @@ export function updateBusinessProfile(
   return {
     ...doc,
     documentType: nextDocType,
+    documentNumber:
+      nextDocType === doc.documentType
+        ? doc.documentNumber
+        : syncManagedDocumentNumber(doc.documentNumber, nextDocType),
     business: nextBusiness,
     adjustments: nextAdjustments,
     updatedAt: new Date().toISOString(),
@@ -64,6 +86,20 @@ export function updateCustomerProfile(
       ...doc.customer,
       ...patch,
     },
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function updateBusinessLogo(
+  doc: DocCraftDocument,
+  logo: BusinessLogo | undefined,
+): DocCraftDocument {
+  const nextBranding: BrandingConfig =
+    logo === undefined ? {} : { logo };
+
+  return {
+    ...doc,
+    branding: nextBranding,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -155,6 +191,10 @@ export function updateAdjustments(
   return {
     ...doc,
     documentType: nextDocType,
+    documentNumber:
+      nextDocType === doc.documentType
+        ? doc.documentNumber
+        : syncManagedDocumentNumber(doc.documentNumber, nextDocType),
     adjustments: nextAdjustments,
     updatedAt: new Date().toISOString(),
   };
@@ -255,6 +295,7 @@ export function setDocumentType(
   return {
     ...doc,
     documentType,
+    documentNumber: syncManagedDocumentNumber(doc.documentNumber, documentType),
     updatedAt: new Date().toISOString(),
   };
 }
