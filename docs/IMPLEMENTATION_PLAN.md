@@ -1,6 +1,6 @@
 # DocCraft — Implementation Plan
 
-> **Status:** Phase 2 CLOSED — Gate 2 PASS after independent remediation. Phase 3 implementation complete under `BRIEF-phase3-a4-preview-print.md`; automated verification recorded in `PHASE3_IMPLEMENTATION_EVIDENCE.md`. Gate 3 NOT YET PASS — pending independent human review. Phase 4 (Local Persistence + JSON Backup) implementation is complete and Gate 4 PASS is independently recorded in `GATE4_INDEPENDENT_REVIEW_2026-08-26.md`. Phase 4 was opened ahead of Gate 3 review by explicit user direction — a deliberate deviation from this document's own sequencing rule, not an oversight. Phase 5 must not open until Gate 3 and the inserted Gate 4.1 are PASS; Gate 4 is already PASS.
+> **Status:** Gates 1–4 PASS/CLOSED. Phase 4.1 / DC-SR-01 Business Logo CLOSED on 2026-09-06 at implementation commit `11f21e55ae2789720b393411097db4b08b107967` after independent Stage QA and Owner native-print acceptance. Phase 5 is the next bounded phase but requires a fresh implementation plan/authorization before code changes.
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง
@@ -253,3 +253,13 @@ Product owner approved the constrained Business Logo capability for V1 after rev
 - Advanced templates/themes, arbitrary layout control, multiple logos/watermarks and brand kits remain post-MVP Phase 9 candidates.
 - `BRIEF-phase4.1-business-logo-branding-block.md` must be reviewed before production-code changes.
 - Phase 5 cannot open until all earlier required gates, including Gate 4.1, are PASS.
+
+## Gate 4.1 Closure — 2026-09-06
+This amendment supersedes earlier Phase 4.1 "not opened" / pending-gate language for current execution status only; historical dated evidence remains unchanged.
+
+- **Gate 4.1: PASS / CLOSED** at implementation commit `11f21e55ae2789720b393411097db4b08b107967`.
+- Independent Stage QA: `agent-qwen` task `t_7c87a5cc` = PASS.
+- Deterministic integration/final relay evidence under `t_b77aaa67` = PASS.
+- Owner native Chrome print-preview/manual closure matrix = PASS.
+- Final verification after the bounded document-number usability remediation: lint PASS, typecheck PASS, 136/136 unit tests, production build PASS, 36/36 Chromium E2E, `git diff --check` PASS.
+- Next phase: **Phase 5 / DC-SR-02 PromptPay Document QR**. Planning is required before implementation; no cloud/account/subscription scope is authorized.
