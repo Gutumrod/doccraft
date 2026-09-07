@@ -84,4 +84,4 @@ Rollback evidence:
 - real Wrangler rollback restored known-good version to 100% traffic
 - subsequent production HTTP check returned 200
 
-Gate state: READY FOR INDEPENDENT GATE 6 REVIEW; not closed by this implementation session. See `PHASE6_MVP_IMPLEMENTATION_EVIDENCE.md`.
+Gate 6 closure — 2026-09-07: **PASS / CLOSED** after independent review of implementation checkpoint `01115cc908adcbc4224d3d7878f8680da287439e`. Canonical verdict: `GATE6_INDEPENDENT_REVIEW_2026-09-07.md`. Next authorized stage is Public Pilot / PV Gate; Phase 7 remains frozen until PV Gate = PASS.

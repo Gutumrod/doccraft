@@ -3,13 +3,14 @@
 **Product:** DocCraft (DC01)
 **Repository branch:** `master`
 **Phase 5 durable checkpoint:** `2b4b9d18a76ab329e9228d41c94bbbf9f780fbee`
+**Reviewed Phase 6 implementation:** `01115cc908adcbc4224d3d7878f8680da287439e`
 **Production:** `https://dc01.wstera.com`
-**Working state:** Phase 6 implementation and evidence are READY FOR INDEPENDENT GATE 6 REVIEW. Gate 6 remains OPEN until an independent reviewer returns PASS.
+**Working state:** Gates 1–6 are PASS / CLOSED. Independent Gate 6 review returned `GATE 6 — PASS`. Public Pilot / PV Gate is the next authorized stage.
 **Purpose:** current-state overlay only; historical gate/evidence documents keep their own dated authority.
 
 ## Verified Current State
 
-Gates 1 through 5 are PASS / CLOSED. Phase 6 release implementation has completed its builder-side verification and production evidence pack.
+Gates 1 through 6 are PASS / CLOSED. Phase 6 Release Candidate is closed at reviewed implementation `01115cc908adcbc4224d3d7878f8680da287439e`. Independent review is preserved in `GATE6_INDEPENDENT_REVIEW_2026-09-07.md`.
 
 Phase 6 completed evidence:
 - lint / typecheck / build PASS
@@ -42,22 +43,26 @@ Public Pilot operational mode:
 - PromptPay QR is document instruction only, not payment confirmation
 - support: DocCraft GitHub Issues, best-effort / no SLA
 
-## Gate 6 Boundary
+## Gate 6 Closure — 2026-09-07
 
-Gate 6 is **not closed by the builder/coordinator**.
+Independent review completed against committed implementation `01115cc908adcbc4224d3d7878f8680da287439e` from an isolated detached worktree.
 
-Remaining closure step:
-1. independent reviewer inspects the committed Phase 6 checkpoint and actual production evidence
-2. reviewer returns exactly `GATE 6 — PASS` or `GATE 6 — REMEDIATE`
+- verdict: `GATE 6 — PASS`
+- CRITICAL: none
+- HIGH: none
+- unresolved P0/P1: none
+- mandatory remediation blocking Public Pilot: none
+- canonical review: `GATE6_INDEPENDENT_REVIEW_2026-09-07.md`
 
-Until PASS:
-- PV Gate is not started
-- Phase 7 / Supabase / Auth / Cloud sync remains frozen
-- Phase 8 billing remains frozen
-- Phase 9 post-MVP capability work remains frozen
+Public Pilot follow-up / non-blocking:
+- M-1 — application-level “no telemetry” wording does not cover Cloudflare provider-layer logging/reporting
+- M-2 — production smoke does not directly assert security headers
+- M-3 — evidence pack does not preserve raw Wrangler dry-run / rollback / deployments-list transcripts
+- M-4 — Chrome may use the printer default Paper size (for example Letter) even when print CSS declares A4
+
 ## Next Action
 
-Independent Gate 6 review is next, using the durable Phase 6 pre-review checkpoint. Do not open Phase 7.
+Begin Public Pilot / PV Gate execution. Phase 7 / Supabase / Auth / Cloud sync, Phase 8 billing, and Phase 9 post-MVP capabilities remain frozen until PV Gate = PASS.
 
 ## Change Rule
 

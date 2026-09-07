@@ -1,6 +1,6 @@
 # DocCraft — Implementation Plan
 
-> **Status:** Gates 1–5 PASS/CLOSED. Phase 6 builder work and production evidence are READY FOR INDEPENDENT GATE 6 REVIEW from baseline `2b4b9d18a76ab329e9228d41c94bbbf9f780fbee`; Gate 6 remains OPEN until independent PASS. Phase 7–9 remain frozen; after Gate 6 only Public Pilot / PV Gate is authorized.
+> **Status:** Gates 1–6 PASS/CLOSED. Phase 6 reviewed implementation is `01115cc908adcbc4224d3d7878f8680da287439e`; independent Gate 6 review = PASS. Public Pilot / PV Gate is the next authorized stage. Phase 7–9 remain frozen until PV Gate = PASS.
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง
@@ -211,6 +211,15 @@ MVP ผ่านได้เมื่อ:
 - no-login/no-backend smoke test ผ่าน
 - reviewer ตรวจ implementation/diff/test evidence จริง
 - สร้าง `PHASE6_MVP_IMPLEMENTATION_EVIDENCE.md` และ release runbook แล้ว
+
+### Gate 6 Closure amendment — 2026-09-07
+- **Gate 6 = PASS / CLOSED**.
+- Reviewed implementation checkpoint: `01115cc908adcbc4224d3d7878f8680da287439e`.
+- Independent review artifact: `GATE6_INDEPENDENT_REVIEW_2026-09-07.md`.
+- Reviewer findings: CRITICAL none, HIGH none, unresolved P0/P1 none, and no mandatory remediation blocking Public Pilot.
+- M-1 through M-4 are retained as **Public Pilot Follow-up / Non-blocking**: provider-layer telemetry wording, direct security-header assertions in production smoke, raw Wrangler transcript evidence, and Chrome printer-default Paper size behavior.
+- Next authorized stage: **Public Pilot / PV Gate**.
+- Phase 7 remains prohibited until PV Gate = PASS; Phase 8–9 remain frozen behind their existing sequencing.
 
 ## PV — Pilot Validation & Operational Readiness Gate
 Phase 7 ห้ามเปิดจน Phase 6 ผ่านและ `PRODUCT_VALIDATION_PLAN.md` มี real-user evidence พร้อม operational readiness ตาม `MVP_METRICS_AND_ANALYTICS.md`, `ONBOARDING_AND_SUPPORT.md`, `RELEASE_AND_OPERATIONS_RUNBOOK.md` และ `TERMS_PRIVACY_AND_DATA_NOTICE.md`.

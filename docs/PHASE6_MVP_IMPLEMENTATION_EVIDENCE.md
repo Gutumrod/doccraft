@@ -198,3 +198,25 @@ Until that independent verdict is PASS:
 - Gate 6 remains open
 - Public Pilot is deployed for release verification but PV Gate is not started
 - Phase 7 remains frozen
+
+## Independent Gate 6 Closure — 2026-09-07
+
+Independent review completed against committed implementation `01115cc908adcbc4224d3d7878f8680da287439e` in isolated worktree `D:\AI-Workspace\runtime\reviews\doccraft-gate6-01115cc`.
+
+- Canonical review: `docs/GATE6_INDEPENDENT_REVIEW_2026-09-07.md`
+- Exact reviewer verdict: `GATE 6 — PASS`
+- Gate 6: **PASS / CLOSED**
+- CRITICAL: none
+- HIGH: none
+- unresolved P0/P1: none
+- mandatory remediation blocking Public Pilot: none
+
+Reviewer findings M-1 through M-4 are preserved as **Public Pilot Follow-up / Non-blocking**:
+- M-1 — application-level “no telemetry” wording does not cover Cloudflare provider-layer logging/reporting.
+- M-2 — production smoke does not directly assert security headers.
+- M-3 — evidence pack does not preserve raw Wrangler dry-run / rollback / deployments-list transcripts.
+- M-4 — Chrome may use the printer default Paper size (for example Letter) even when print CSS declares A4.
+
+The builder disposition above remains historical and is not rewritten as a self-declared PASS. The independent reviewer supplied the closure verdict.
+
+Next authorized stage: **Public Pilot / PV Gate**. Phase 7 remains frozen until PV Gate = PASS; Phase 8–9 remain frozen behind the existing roadmap sequence.
