@@ -1,6 +1,6 @@
 # DocCraft — Implementation Plan
 
-> **Status:** Gates 1–4 PASS/CLOSED. Phase 4.1 / DC-SR-01 Business Logo CLOSED on 2026-09-06 at implementation commit `11f21e55ae2789720b393411097db4b08b107967` after independent Stage QA and Owner native-print acceptance. Phase 5 is the next bounded phase but requires a fresh implementation plan/authorization before code changes.
+> **Status:** Gates 1–5 PASS/CLOSED. Phase 5 / DC-SR-02 PromptPay Document QR closed on 2026-09-07 after Owner native-print acceptance, bounded HIGH remediation, 147/147 unit tests, 39/39 Chromium E2E, and independent re-review PASS. Phase 6 is next but NOT OPENED.
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง
@@ -165,11 +165,14 @@
 **เป้าหมาย:** เพิ่ม payment instruction ในเอกสาร โดยไม่สร้าง payment collection/billing system
 
 ### งาน
-- PromptPay target validation ตามชนิด identifier ที่ PRD อนุญาต
-- EMV payload builder + CRC
-- amount source modes: deposit / net payable / no fixed amount
-- QR rendering เป็น presentation ของ validated payload
-- invalid target/amount ต้องไม่ render QR ที่ดูใช้งานได้
+- ล็อก Public Pilot V1 identifier contract: mobile + National ID/Tax ID 13 หลักเท่านั้น; identifier type อื่นไม่อยู่ใน Phase 5
+- schema v4 เพิ่ม `payment.promptPay = { enabled, identifierType, identifier, amountMode }` และ migration v3→v4 default disabled
+- PromptPay target normalization/validation แยกตาม identifier type
+- EMV payload builder + CRC อยู่ใน `promptpay` domain
+- amount source modes: deposit / net payable / no fixed amount; fixed amount ต้อง finite, > 0 และอยู่ใน field limit
+- QR rendering เป็น presentation ของ validated payload เท่านั้น
+- invalid target/amount ต้องไม่ render QR ที่ดูใช้งานได้ และต้อง block print เมื่อ payment block visible + PromptPay enabled
+- persistence/autosave/JSON round-trip ต้องรักษา PromptPay config ครบ
 - แยก module นี้จาก future DocCraft subscription billing อย่างเด็ดขาด
 
 ### Gate 5
@@ -178,6 +181,7 @@
 - invalid identifier/amount ถูก reject
 - QR block print ได้โดยไม่แตก layout
 
+**Gate 5 closure — 2026-09-07:** PASS / CLOSED after Owner A4 native-print + real QR account/amount validation, independent review REMEDIATE on one HIGH scientific-notation amount edge case, bounded fail-closed remediation, fresh 147/147 unit + 39/39 Chromium E2E, and independent re-review PASS with no remaining findings.
 ## Phase 6 — MVP Integration, Hardening & Release Candidate
 **เป้าหมาย:** พิสูจน์ V1 ทั้งระบบตาม PRD โดยไม่พึ่ง backend/login
 

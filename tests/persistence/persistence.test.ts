@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { calculateDocument } from '../../src/domain/calculation/calculate';
+import { CURRENT_SCHEMA_VERSION } from '../../src/domain/document/types';
 import { onePageQuotationFixture } from '../../src/domain/fixtures/representative-documents';
 import {
   exportDocumentAsJson,
@@ -46,6 +47,28 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
         // Verify calculation is cleanly derived post-restore
         const calcRes = calculateDocument(loadRes.value);
         expect(calcRes.ok).toBe(true);
+      }
+    });
+
+    it('round-trips enabled PromptPay configuration through local storage', () => {
+      const promptPayDocument = {
+        ...onePageQuotationFixture,
+        payment: {
+          ...onePageQuotationFixture.payment,
+          promptPay: {
+            enabled: true,
+            identifierType: 'national_id_tax_id' as const,
+            identifier: '1234567890123',
+            amountMode: 'net_payable' as const,
+          },
+        },
+      };
+
+      expect(saveDraft(promptPayDocument).ok).toBe(true);
+      const loadRes = loadDraft();
+      expect(loadRes.ok).toBe(true);
+      if (loadRes.ok && loadRes.value) {
+        expect(loadRes.value.payment.promptPay).toEqual(promptPayDocument.payment.promptPay);
       }
     });
 
@@ -181,7 +204,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
     it('accepts valid persisted envelope with savedAt', () => {
       const envelope = {
         storageFormatVersion: 1,
-        schemaVersion: 3,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         savedAt: new Date().toISOString(),
         document: onePageQuotationFixture,
       };
@@ -190,7 +213,26 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       expect(res.ok).toBe(true);
     });
 
-    it('migrates a valid v1 local draft to canonical v3 without unrelated data loss', () => {
+    it('migrates a schema v3 draft to v4 with PromptPay disabled by default', () => {
+      const legacyDocument = JSON.parse(JSON.stringify(onePageQuotationFixture));
+      legacyDocument.schemaVersion = 3;
+      delete legacyDocument.payment.promptPay;
+      const envelope = { storageFormatVersion: 1, schemaVersion: 3, savedAt: '2026-09-06T00:00:00.000Z', document: legacyDocument };
+
+      const res = migratePersistedEnvelope(envelope);
+      expect(res.ok).toBe(true);
+      if (res.ok) {
+        expect(res.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+        expect(res.value.payment.promptPay).toEqual({
+          enabled: false,
+          identifierType: 'mobile',
+          identifier: '',
+          amountMode: 'none',
+        });
+      }
+    });
+
+    it('migrates a valid v1 local draft to canonical v4 without unrelated data loss', () => {
       const legacyDocument = JSON.parse(JSON.stringify(onePageQuotationFixture));
       legacyDocument.schemaVersion = 1;
       legacyDocument.items = legacyDocument.items.map((item: Record<string, unknown>) => { const copy = { ...item }; delete copy.image; return copy; });
@@ -199,7 +241,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       const res = migratePersistedEnvelope(envelope);
       expect(res.ok).toBe(true);
       if (res.ok) {
-        expect(res.value.schemaVersion).toBe(3);
+        expect(res.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
         expect(res.value.id).toBe(onePageQuotationFixture.id);
         expect(res.value.createdAt).toBe(onePageQuotationFixture.createdAt);
         expect(res.value.items.map((item) => item.id)).toEqual(onePageQuotationFixture.items.map((item) => item.id));
@@ -207,20 +249,20 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       }
     });
 
-    it('migrates a valid v1 exported backup to canonical v3', () => {
+    it('migrates a valid v1 exported backup to canonical v4', () => {
       const legacyDocument = JSON.parse(JSON.stringify(onePageQuotationFixture));
       legacyDocument.schemaVersion = 1;
       legacyDocument.items = legacyDocument.items.map((item: Record<string, unknown>) => { const copy = { ...item }; delete copy.image; return copy; });
       const envelope = { app: 'DocCraft', storageFormatVersion: 1, schemaVersion: 1, exportedAt: '2026-08-24T00:00:00.000Z', document: legacyDocument };
       const res = migrateExportEnvelope(envelope);
       expect(res.ok).toBe(true);
-      if (res.ok) expect(res.value.schemaVersion).toBe(3);
+      if (res.ok) expect(res.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     });
 
     it('rejects persisted envelope missing savedAt metadata', () => {
       const envelopeWithoutSavedAt = {
         storageFormatVersion: 1,
-        schemaVersion: 3,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         document: onePageQuotationFixture,
       };
 
@@ -236,7 +278,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       const exportWithoutExportedAt = {
         app: 'DocCraft',
         storageFormatVersion: 1,
-        schemaVersion: 3,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         document: onePageQuotationFixture,
       };
 
@@ -297,7 +339,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       const exportEnvelope = {
         app: 'DocCraft',
         storageFormatVersion: 1,
-        schemaVersion: 3,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         exportedAt: new Date().toISOString(),
         document: onePageQuotationFixture,
       };
@@ -352,7 +394,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
 
       expect(parsed.app).toBe('DocCraft');
       expect(parsed.storageFormatVersion).toBe(1);
-      expect(parsed.schemaVersion).toBe(3);
+      expect(parsed.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
       expect(parsed.exportedAt).toBeDefined();
       expect(parsed.document.id).toBe(onePageQuotationFixture.id);
     });
@@ -366,6 +408,27 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
         expect(importRes.value.id).toBe(onePageQuotationFixture.id);
         expect(importRes.value.documentNumber).toBe(onePageQuotationFixture.documentNumber);
         expect(importRes.value.items.length).toBe(onePageQuotationFixture.items.length);
+      }
+    });
+
+    it('round-trips enabled PromptPay configuration through JSON export and import', () => {
+      const promptPayDocument = {
+        ...onePageQuotationFixture,
+        payment: {
+          ...onePageQuotationFixture.payment,
+          promptPay: {
+            enabled: true,
+            identifierType: 'mobile' as const,
+            identifier: '0812345678',
+            amountMode: 'deposit' as const,
+          },
+        },
+      };
+
+      const importRes = importDocumentFromJson(serializeDocumentForExport(promptPayDocument));
+      expect(importRes.ok).toBe(true);
+      if (importRes.ok) {
+        expect(importRes.value.payment.promptPay).toEqual(promptPayDocument.payment.promptPay);
       }
     });
 
@@ -443,7 +506,7 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
     it('rejects import with invalid document structure (e.g. wrong field types)', () => {
       const invalidPayload = {
         app: 'DocCraft',
-        schemaVersion: 3,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         storageFormatVersion: 1,
         exportedAt: new Date().toISOString(),
         document: {

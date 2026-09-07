@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { calculateDocument } from '../../domain/calculation/calculate';
 import type { DocCraftDocument } from '../../domain/document/types';
+import { resolvePromptPay } from '../../domain/promptpay/resolve';
 import {
   longCustomerAndAddressFixture,
   minimalBlocksFixture,
@@ -51,9 +52,15 @@ export function DocCraftEditor() {
 
   // Pure calculation result derived from domain rules on every render
   const calcResult = calculateDocument(doc);
-  const isValid = calcResult.ok;
   const totals = calcResult.ok ? calcResult.value : undefined;
-  const errors = !calcResult.ok ? calcResult.errors : [];
+  const promptPayActive = doc.blocks.payment && doc.payment.promptPay.enabled;
+  const promptPayResult = calcResult.ok && promptPayActive
+    ? resolvePromptPay(doc.payment.promptPay, calcResult.value)
+    : null;
+  const promptPayErrors = promptPayResult && !promptPayResult.ok ? promptPayResult.errors : [];
+  const errors = calcResult.ok ? promptPayErrors : calcResult.errors;
+  const isValid = calcResult.ok && promptPayErrors.length === 0;
+  const resolvedPromptPay = promptPayResult?.ok ? promptPayResult.value : undefined;
 
   // Restore draft from browser storage on client mount
   useEffect(() => {
@@ -478,7 +485,7 @@ export function DocCraftEditor() {
                   <span>🖨️ พิมพ์ (Print)</span>
                 </button>
               </div>
-              <DocumentPreview document={doc} totals={totals} errors={errors} />
+              <DocumentPreview document={doc} totals={totals} errors={errors} promptPay={resolvedPromptPay} />
             </div>
           </div>
         </div>

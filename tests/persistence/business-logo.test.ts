@@ -188,7 +188,7 @@ describe('Phase 4.1 business logo validation and processing', () => {
 });
 
 describe('Phase 4.1 business logo migration, persistence, and editor semantics', () => {
-  it('migrates schema-v2 documents without logo fields to canonical v3 defaults', () => {
+  it('migrates schema-v2 documents without logo fields through to canonical v4 defaults', () => {
     const legacy = legacyV2DocumentWithoutLogo();
     const result = migratePersistedEnvelope({
       storageFormatVersion: 1,

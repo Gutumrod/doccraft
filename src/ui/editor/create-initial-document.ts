@@ -48,7 +48,14 @@ export function createInitialDocument(): DocCraftDocument {
       },
       deposit: { mode: 'none' },
     },
-    payment: {},
+    payment: {
+      promptPay: {
+        enabled: false,
+        identifierType: 'mobile',
+        identifier: '',
+        amountMode: 'none',
+      },
+    },
     blocks: {
       business: true,
       businessLogo: true,

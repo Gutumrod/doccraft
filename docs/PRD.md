@@ -173,8 +173,11 @@ PromptPay QR บนเอกสารคือ **payment instruction ของ�
 
 V1:
 - generate QR client-side จาก PromptPay identifier ที่ผู้ใช้กำหนด
-- optional amount = deposit หรือ net payable ตาม explicit selection
-- validate identifier และ amount
+- supported identifier types: เบอร์มือถือ และเลขบัตรประชาชน/เลขผู้เสียภาษี 13 หลักเท่านั้น
+- e-Wallet, bank-account proxy, email, biller และ identifier type อื่นอยู่นอก Phase 5 / Public Pilot V1
+- optional amount = no fixed amount, deposit หรือ net payable ตาม explicit selection
+- validate/normalize identifier และ reject amount ที่ไม่ finite, <= 0 หรือเกิน field limit เมื่อเลือก fixed amount
+- schema v4 เก็บ PromptPay config แบบ explicit (`enabled`, `identifierType`, `identifier`, `amountMode`) และ migration จาก v3 ต้อง default เป็น disabled
 - มี test vectors สำหรับ payload/CRC
 
 V1 ไม่ตรวจว่าเงินถูกโอนสำเร็จ และไม่อัปเดตสถานะ paid อัตโนมัติ

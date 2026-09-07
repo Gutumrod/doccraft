@@ -59,6 +59,7 @@ export const onePageQuotationFixture: DocCraftDocument = {
     deposit: { mode: 'percent', value: 50 },
   },
   payment: {
+    promptPay: { enabled: false, identifierType: 'mobile', identifier: '', amountMode: 'none' },
     instructions: 'ธนาคารกสิกรไทย (KBANK)\nเลขที่บัญชี: 123-4-56789-0\nชื่อบัญชี: บจก. สยาม คราฟต์ โซลูชั่นส์',
   },
   blocks: {
@@ -125,6 +126,7 @@ export const multiPageDocumentFixture: DocCraftDocument = {
     deposit: { mode: 'none' },
   },
   payment: {
+    promptPay: { enabled: false, identifierType: 'mobile', identifier: '', amountMode: 'none' },
     instructions: 'โอนเงินเข้าบัญชีธนาคารกรุงเทพ สาขาสีลม\nเลขที่บัญชี: 101-9-87654-3\nชื่อบัญชี: บมจ. ไทยเมกะคอนสตรัคชั่น แอนด์ ซัพพลาย',
   },
   blocks: {
@@ -190,6 +192,7 @@ export const richThaiTextFixture: DocCraftDocument = {
     deposit: { mode: 'none' },
   },
   payment: {
+    promptPay: { enabled: false, identifierType: 'mobile', identifier: '', amountMode: 'none' },
     instructions: 'รับชำระเป็นเงินสด หรือโอนเงินผ่านระบบพร้อมเพย์ (PromptPay)\nเบอร์โทรศัพท์: 081-234-5678 (นายกิตติศักดิ์ พรหมมินทร์ปรีชากุล)',
   },
   blocks: {
@@ -256,6 +259,7 @@ export const longCustomerAndAddressFixture: DocCraftDocument = {
     deposit: { mode: 'none' },
   },
   payment: {
+    promptPay: { enabled: false, identifierType: 'mobile', identifier: '', amountMode: 'none' },
     instructions: 'ธนาคารไทยพาณิชย์ จำกัด (มหาชน)\nเลขที่บัญชี: 001-2-34567-8\nชื่อบัญชี: บมจ. สยามเอนเตอร์ไพรส์อินโนเวชั่นเน็ตเวิร์กแอนด์เทคโนโลยีซิสเต็มส์โกลบอล',
   },
   blocks: {

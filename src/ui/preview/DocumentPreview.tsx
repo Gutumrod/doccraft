@@ -2,14 +2,17 @@
 'use client';
 
 import React from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import type { CalculationTotals } from '../../domain/calculation/types';
 import type { DocCraftDocument, DocumentType } from '../../domain/document/types';
+import type { ResolvedPromptPay } from '../../domain/promptpay/types';
 import type { ValidationIssue } from '../../domain/validation/result';
 
 interface DocumentPreviewProps {
   document: DocCraftDocument;
   totals?: CalculationTotals;
   errors?: ValidationIssue[];
+  promptPay?: ResolvedPromptPay;
 }
 
 const DOCUMENT_TITLES: Record<DocumentType, { th: string; en: string }> = {
@@ -20,7 +23,7 @@ const DOCUMENT_TITLES: Record<DocumentType, { th: string; en: string }> = {
   tax_invoice: { th: 'ใบกำกับภาษี', en: 'TAX INVOICE' },
 };
 
-export function DocumentPreview({ document, totals, errors }: DocumentPreviewProps) {
+export function DocumentPreview({ document, totals, errors, promptPay }: DocumentPreviewProps) {
   const { blocks, business, customer, items } = document;
   const lineMap = new Map(totals?.lines.map((l) => [l.id, l]));
 
@@ -258,14 +261,30 @@ export function DocumentPreview({ document, totals, errors }: DocumentPreviewPro
       )}
 
       {/* Payment Block */}
-      {blocks.payment && document.payment.instructions && (
+      {blocks.payment && (document.payment.instructions || promptPay) && (
         <div data-testid="preview-block-payment" className="print-payment-card print-avoid-break mb-8 rounded-xl bg-slate-50/70 p-4 border border-slate-200 break-words">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-2">
             ข้อมูลการชำระเงิน (Payment Details)
           </span>
-          <p className="whitespace-pre-line text-xs text-slate-800 leading-relaxed font-mono break-words">
-            {document.payment.instructions}
-          </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            {document.payment.instructions && (
+              <p className="whitespace-pre-line text-xs text-slate-800 leading-relaxed font-mono break-words">
+                {document.payment.instructions}
+              </p>
+            )}
+            {promptPay && (
+              <div data-testid="preview-promptpay-qr" className="shrink-0 rounded-lg border border-slate-200 bg-white p-3 text-center">
+                <QRCodeSVG value={promptPay.payload} size={128} level="M" marginSize={1} title="PromptPay QR" />
+                <div className="mt-2 text-[10px] font-bold text-slate-700">PromptPay</div>
+                <div className="text-[9px] text-slate-500 font-mono">{promptPay.normalizedIdentifier}</div>
+                {promptPay.amount !== undefined && (
+                  <div className="mt-0.5 text-[10px] font-semibold text-slate-800">
+                    {promptPay.amount.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

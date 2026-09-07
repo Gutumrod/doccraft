@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { calculateDocument } from '../../src/domain/calculation/calculate';
+import { CURRENT_SCHEMA_VERSION } from '../../src/domain/document/types';
 import {
   longCustomerAndAddressFixture,
   minimalBlocksFixture,
@@ -10,8 +11,8 @@ import {
 } from '../../src/domain/fixtures/representative-documents';
 
 describe('Phase 3 — Representative Document Fixtures & Print Validation', () => {
-  it('1. onePageQuotationFixture passes pure calculation and conforms to schema v2', () => {
-    expect(onePageQuotationFixture.schemaVersion).toBe(3);
+  it('1. onePageQuotationFixture passes pure calculation and conforms to the current schema', () => {
+    expect(onePageQuotationFixture.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(onePageQuotationFixture.items.length).toBe(3);
 
     const calcResult = calculateDocument(onePageQuotationFixture);
@@ -39,7 +40,7 @@ describe('Phase 3 — Representative Document Fixtures & Print Validation', () =
   });
 
   it('2. multiPageDocumentFixture passes calculation for 20+ line items', () => {
-    expect(multiPageDocumentFixture.schemaVersion).toBe(3);
+    expect(multiPageDocumentFixture.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(multiPageDocumentFixture.items.length).toBe(22);
 
     const calcResult = calculateDocument(multiPageDocumentFixture);
@@ -55,7 +56,7 @@ describe('Phase 3 — Representative Document Fixtures & Print Validation', () =
   });
 
   it('3. richThaiTextFixture passes calculation and verifies Thai metadata', () => {
-    expect(richThaiTextFixture.schemaVersion).toBe(3);
+    expect(richThaiTextFixture.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(richThaiTextFixture.documentType).toBe('receipt');
     expect(richThaiTextFixture.business.displayName).toContain('นายกิตติศักดิ์ พรหมมินทร์ปรีชากุล');
     expect(richThaiTextFixture.customer.displayName).toContain('คุณหญิงประไพศรี');
@@ -75,7 +76,7 @@ describe('Phase 3 — Representative Document Fixtures & Print Validation', () =
   });
 
   it('4. longCustomerAndAddressFixture passes calculation for registered tax invoice', () => {
-    expect(longCustomerAndAddressFixture.schemaVersion).toBe(3);
+    expect(longCustomerAndAddressFixture.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(longCustomerAndAddressFixture.documentType).toBe('tax_invoice');
 
     const calcResult = calculateDocument(longCustomerAndAddressFixture);

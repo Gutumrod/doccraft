@@ -1,24 +1,25 @@
 # DocCraft — Phase 5 Execution Brief: PromptPay Document QR
 
 > **Phase:** 5 — PromptPay Document QR
-> **Status:** PREPARED — NOT OPENED
+> **Status:** PASS — CLOSED (2026-09-07)
 > **Prepared:** 2026-08-24
+> **Opened:** 2026-09-06 by Owner authorization
 > **Repository:** `Gutumrod/doccraft`
 > **Branch:** `master`
-> **Preparation Baseline:** `c9f8f0b` plus documentation review changes
-> **Open Preconditions:** Gate 3 PASS + Gate 4 PASS after Phase 4 remediation
+> **Implementation Baseline:** `15a58ccca221a9d568513f103b9d163cdc9dd382`
+> **Open Preconditions:** SATISFIED — Gates 3, 4 and 4.1 closed before Phase 5 opening
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 
 ## 0. Gate Notice
-This brief is prepared for handoff only. It does not authorize Phase 5 implementation while `GATE_REVIEW_PHASE3_PHASE4_2026-08-24.md` remains REMEDIATE.
+Phase 5 was explicitly opened by Owner on 2026-09-06 after the repository was verified clean at the implementation baseline above. The previous August REMEDIATE notice is superseded by the later closed Gates 3, 4 and 4.1 evidence.
 
-Before writing Phase 5 code, the implementer must verify the current branch, clean working tree, HEAD, dependencies, scripts, and the final Phase 4 persistence/schema representation after remediation.
+Implementation remained bounded to this brief. Gate 5 closed on 2026-09-07 after automated verification, Owner native-print acceptance, one bounded remediation from independent review, and independent re-review PASS.
 
 ## 1. Objective
 Add a client-side PromptPay QR payment instruction block to DocCraft documents. This capability generates a validated PromptPay EMV payload and QR presentation for the user's customer; it is not DocCraft subscription billing and does not confirm payment.
 
 ## 2. In Scope
-- PromptPay identifier model and validation for the identifier types allowed by the PRD
+- PromptPay identifier model and validation for Public Pilot V1: mobile + National ID/Tax ID 13 หลักเท่านั้น
 - deterministic EMV payload builder
 - CRC calculation and known-vector tests
 - explicit amount source modes:
@@ -88,6 +89,17 @@ Phase 5 may pass only when:
 - unit, typecheck, lint, build, and Playwright E2E all pass
 - independent reviewer inspects the actual diff and evidence
 
+Owner native-print acceptance: **PASS — 2026-09-07**
+- Native Chrome print preview set to A4 and remained one sheet.
+- QR remained readable; no critical layout breakage was observed.
+- Owner confirmed the generated QR resolves to the correct PromptPay account and amount.
+
+Independent review chronology:
+- initial independent review: `GATE 5 — REMEDIATE` for one HIGH scientific-notation amount-format edge case
+- bounded remediation added canonical decimal formatting/validation and direct payload-builder defense-in-depth
+- post-remediation verification: 12 files / 147 tests PASS, 39/39 Chromium E2E PASS, lint/typecheck/build/diff-check PASS
+- independent re-review: `GATE 5 — PASS`; no CRITICAL/HIGH/MEDIUM/LOW findings remain
+
 ## 8. Stop Conditions
 Stop Phase 5 and return to documentation review if:
 - the implementation would require payment confirmation, webhook, gateway credentials, or server-side payment state
@@ -97,4 +109,4 @@ Stop Phase 5 and return to documentation review if:
 - Phase 1–4 regression fails due to a contract conflict
 
 ## 9. Handoff State
-This brief is ready for future execution but remains **NOT OPENED**. The next executable work item is `BRIEF-phase4-remediation-image-pipeline.md`, plus the human Phase 3 reference print acceptance. After both Gate 3 and Gate 4 are PASS, update this brief's baseline to the then-current HEAD and open Phase 5 explicitly.
+Phase 5 is **PASS / CLOSED** on 2026-09-07. Identifier scope remains locked to mobile + National ID/Tax ID 13 หลัก, schema v4 is the canonical Phase 5 representation, and no cloud/account/subscription/payment-confirmation scope was introduced. Phase 6 is next in the roadmap but remains unopened until its execution plan is prepared/reviewed.

@@ -112,12 +112,12 @@ afterEach(() => {
 });
 
 describe('Phase 4 remediation — canonical image persistence', () => {
-  it('accepts the current canonical schema v3', () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(3);
+  it('accepts the current canonical schema v4', () => {
+    expect(onePageQuotationFixture.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(validateCanonicalDocument(onePageQuotationFixture).ok).toBe(true);
   });
 
-  it('migrates a real v1 persisted draft to v3 and preserves identity/timestamps', () => {
+  it('migrates a real v1 persisted draft to v4 and preserves identity/timestamps', () => {
     const legacy = legacyV1Document();
     const result = migratePersistedEnvelope({
       storageFormatVersion: 1,
@@ -127,7 +127,7 @@ describe('Phase 4 remediation — canonical image persistence', () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.schemaVersion).toBe(3);
+      expect(result.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
       expect(result.value.id).toBe(onePageQuotationFixture.id);
       expect(result.value.createdAt).toBe(onePageQuotationFixture.createdAt);
       expect(result.value.updatedAt).toBe(onePageQuotationFixture.updatedAt);
@@ -136,7 +136,7 @@ describe('Phase 4 remediation — canonical image persistence', () => {
     }
   });
 
-  it('migrates a real v1 exported backup to v3', () => {
+  it('migrates a real v1 exported backup to v4', () => {
     const result = migrateExportEnvelope({
       app: 'DocCraft',
       storageFormatVersion: 1,
@@ -145,7 +145,7 @@ describe('Phase 4 remediation — canonical image persistence', () => {
       document: legacyV1Document(),
     });
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.value.schemaVersion).toBe(3);
+    if (result.ok) expect(result.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
   });
 
   it('rejects future schema and envelope/document version mismatch', () => {

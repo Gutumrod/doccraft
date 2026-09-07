@@ -5,6 +5,7 @@ import { validateCanonicalDocument } from './validation';
 
 const LEGACY_SCHEMA_VERSION_1 = 1;
 const LEGACY_SCHEMA_VERSION_2 = 2;
+const LEGACY_SCHEMA_VERSION_3 = 3;
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -19,17 +20,51 @@ function unsupportedSchema(version: unknown, label: string): PersistenceResult<D
     ok: false,
     error: createPersistenceError(
       'UNSUPPORTED_SCHEMA_VERSION',
-      `Unsupported ${label} schema version: ${String(version)} (supported: ${LEGACY_SCHEMA_VERSION_1}, ${LEGACY_SCHEMA_VERSION_2} or ${CURRENT_SCHEMA_VERSION})`,
+      `Unsupported ${label} schema version: ${String(version)} (supported: ${LEGACY_SCHEMA_VERSION_1}, ${LEGACY_SCHEMA_VERSION_2}, ${LEGACY_SCHEMA_VERSION_3} or ${CURRENT_SCHEMA_VERSION})`,
     ),
   };
 }
 
+function upgradeV3ToCurrentSchema(
+  rawDocument: Record<string, unknown>,
+  label: string,
+): PersistenceResult<DocCraftDocument> {
+  if (rawDocument.schemaVersion !== LEGACY_SCHEMA_VERSION_3) {
+    return {
+      ok: false,
+      error: createPersistenceError(
+        'ENVELOPE_VALIDATION_FAILED',
+        `Version mismatch: ${label} schemaVersion (${String(rawDocument.schemaVersion)}) does not match expected v3 before upgrade`,
+      ),
+    };
+  }
+
+  if (!isObject(rawDocument.payment)) {
+    return {
+      ok: false,
+      error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', `Legacy document payment must be an object (${label})`),
+    };
+  }
+
+  const migratedDocument: Record<string, unknown> = {
+    ...rawDocument,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    payment: {
+      ...rawDocument.payment,
+      promptPay: {
+        enabled: false,
+        identifierType: 'mobile',
+        identifier: '',
+        amountMode: 'none',
+      },
+    },
+  };
+
+  return validateCanonicalDocument(migratedDocument);
+}
+
 /**
- * Upgrade a migrated document to the current schema (v3). Phases 4.1 adds a
- * document-level `branding` config and a `blocks.businessLogo` show/hide flag.
- * Existing documents that never had a logo must default businessLogo to true and
- * start with an empty branding config, matching the accepted-logo defaults for new
- * documents.
+ * Upgrade a v2 document through Phase 4.1 schema v3 and then to current schema.
  */
 function upgradeToCurrentSchema(
   rawDocument: Record<string, unknown>,
@@ -55,7 +90,7 @@ function upgradeToCurrentSchema(
 
   const migratedDocument: Record<string, unknown> = {
     ...rawDocument,
-    schemaVersion: CURRENT_SCHEMA_VERSION,
+    schemaVersion: LEGACY_SCHEMA_VERSION_3,
     branding: {},
     blocks: {
       ...blocks,
@@ -65,7 +100,7 @@ function upgradeToCurrentSchema(
     },
   };
 
-  return validateCanonicalDocument(migratedDocument);
+  return upgradeV3ToCurrentSchema(migratedDocument, label);
 }
 
 function migrateDocument(
@@ -85,6 +120,10 @@ function migrateDocument(
 
   if (envelopeSchemaVersion === CURRENT_SCHEMA_VERSION) {
     return validateCanonicalDocument(rawDocument);
+  }
+
+  if (envelopeSchemaVersion === LEGACY_SCHEMA_VERSION_3) {
+    return upgradeV3ToCurrentSchema(rawDocument, label);
   }
 
   if (envelopeSchemaVersion === LEGACY_SCHEMA_VERSION_2) {
@@ -191,6 +230,7 @@ export function migratePersistedEnvelope(rawPayload: unknown): PersistenceResult
   if (
     schemaVersion !== LEGACY_SCHEMA_VERSION_1 &&
     schemaVersion !== LEGACY_SCHEMA_VERSION_2 &&
+    schemaVersion !== LEGACY_SCHEMA_VERSION_3 &&
     schemaVersion !== CURRENT_SCHEMA_VERSION
   ) {
     return unsupportedSchema(schemaVersion, 'storage');
@@ -221,6 +261,7 @@ export function migrateExportEnvelope(rawPayload: unknown): PersistenceResult<Do
   if (
     schemaVersion !== LEGACY_SCHEMA_VERSION_1 &&
     schemaVersion !== LEGACY_SCHEMA_VERSION_2 &&
+    schemaVersion !== LEGACY_SCHEMA_VERSION_3 &&
     schemaVersion !== CURRENT_SCHEMA_VERSION
   ) {
     return unsupportedSchema(schemaVersion, 'backup');

@@ -36,7 +36,9 @@ export function makeDocument(): DocCraftDocument {
       wht: { enabled: false, ratePercent: 3, basisLineItemIds: [] },
       deposit: { mode: 'none' },
     },
-    payment: {},
+    payment: {
+      promptPay: { enabled: false, identifierType: 'mobile', identifier: '', amountMode: 'none' },
+    },
     blocks: {
       business: true,
       businessLogo: true,

@@ -65,8 +65,8 @@ test.describe('Phase 4.1 — business logo branding E2E', () => {
       const raw = window.localStorage.getItem('doccraft_current_draft_v1');
       if (!raw) return false;
       const envelope = JSON.parse(raw);
-      return envelope.schemaVersion === 3
-        && envelope.document.schemaVersion === 3
+      return envelope.schemaVersion === 4
+        && envelope.document.schemaVersion === 4
         && envelope.document.blocks.businessLogo === true
         && typeof envelope.document.branding?.logo?.dataUrl === 'string';
     });

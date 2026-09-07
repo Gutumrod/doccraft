@@ -9,6 +9,11 @@ import {
   type LineItem,
 } from '../domain/document/types';
 import type { BranchType, EntityType, VatStatus } from '../domain/tax/types';
+import {
+  PROMPTPAY_AMOUNT_MODES,
+  PROMPTPAY_IDENTIFIER_TYPES,
+  type PromptPayConfig,
+} from '../domain/promptpay/types';
 import { validateBusinessLogoStructure } from '../image/business-logo';
 import { validateItemImageStructure } from '../image/item-image';
 import { createPersistenceError } from './errors';
@@ -60,6 +65,33 @@ function validateDeposit(raw: unknown, path: string): PersistenceResult<DepositC
     return { ok: true, value: { mode: raw.mode, value: raw.value } };
   }
   return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', `${path}.mode must be 'none', 'percent', or 'fixed'`) };
+}
+
+function validatePromptPay(raw: unknown): PersistenceResult<PromptPayConfig> {
+  if (!isObject(raw)) {
+    return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.promptPay must be an object') };
+  }
+  if (!isBoolean(raw.enabled)) {
+    return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.promptPay.enabled must be boolean') };
+  }
+  if (!PROMPTPAY_IDENTIFIER_TYPES.includes(raw.identifierType as PromptPayConfig['identifierType'])) {
+    return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.promptPay.identifierType is unsupported') };
+  }
+  if (!isString(raw.identifier)) {
+    return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.promptPay.identifier must be a string') };
+  }
+  if (!PROMPTPAY_AMOUNT_MODES.includes(raw.amountMode as PromptPayConfig['amountMode'])) {
+    return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.promptPay.amountMode is unsupported') };
+  }
+  return {
+    ok: true,
+    value: {
+      enabled: raw.enabled,
+      identifierType: raw.identifierType as PromptPayConfig['identifierType'],
+      identifier: raw.identifier,
+      amountMode: raw.amountMode as PromptPayConfig['amountMode'],
+    },
+  };
 }
 
 function validateLineItem(raw: unknown, index: number): PersistenceResult<LineItem> {
@@ -336,6 +368,8 @@ export function validateCanonicalDocument(raw: unknown): PersistenceResult<DocCr
   if (raw.payment.instructions !== undefined && !isString(raw.payment.instructions)) {
     return { ok: false, error: createPersistenceError('INVALID_DOCUMENT_STRUCTURE', 'payment.instructions must be a string if provided') };
   }
+  const promptPayRes = validatePromptPay(raw.payment.promptPay);
+  if (!promptPayRes.ok) return promptPayRes;
 
   // 7a. Branding (Phase 4.1 business logo)
   const brandingRes = validateBranding(raw.branding);
@@ -389,6 +423,7 @@ export function validateCanonicalDocument(raw: unknown): PersistenceResult<DocCr
     },
     payment: {
       instructions: raw.payment.instructions,
+      promptPay: promptPayRes.value,
     },
     blocks: blocksRes.value,
     terms: raw.terms,

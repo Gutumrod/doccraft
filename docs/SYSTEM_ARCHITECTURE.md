@@ -99,9 +99,12 @@ Reference environment: Chrome/Edge desktop
 ## 6. PromptPay Boundary
 
 PromptPay generator ใช้เฉพาะ QR payment instruction บนเอกสารของผู้ใช้
-- client-side generation
-- optional amount = deposit หรือ net payable ตาม explicit selection
-- validate target + amount
+- client-side generation; QR renderer เป็น presentation-only และไม่เป็นเจ้าของ payload/CRC logic
+- Phase 5/Public Pilot V1 รองรับ mobile (PromptPay sub-tag `01`) และ National ID/Tax ID 13 หลัก (sub-tag `02`) เท่านั้น
+- optional amount = no fixed amount, deposit หรือ net payable ตาม explicit selection
+- `promptpay` domain รับผิดชอบ normalize/validate target, resolve amount, EMV payload และ CRC; calculation domain ไม่รู้จัก PromptPay
+- schema v4 เพิ่ม `payment.promptPay` และ migration v3→v4 default เป็น disabled โดยไม่ลบ payment instructions เดิม
+- editor/print รวม PromptPay validity แบบ fail-closed เฉพาะเมื่อ payment block visible และ PromptPay enabled
 - test known payload/CRC vectors
 
 V1 ไม่มี payment confirmation, webhook หรือ paid-status automation

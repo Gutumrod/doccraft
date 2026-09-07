@@ -1,6 +1,7 @@
 import type { BusinessProfile, VatConfig } from '../tax/types';
+import type { PromptPayConfig } from '../promptpay/types';
 
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 
 export const DOCUMENT_TYPES = [
   'quotation',
@@ -72,6 +73,7 @@ export interface AdjustmentConfig {
 
 export interface PaymentConfig {
   instructions?: string;
+  promptPay: PromptPayConfig;
 }
 
 export interface BlockVisibility {
