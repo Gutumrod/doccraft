@@ -26,6 +26,11 @@ Onboarding ต้องอธิบายชัด:
 ก่อน Public Pilot ต้องมี support contact ที่ประกาศจริงอย่างน้อยหนึ่งช่องทาง และระบุเวลาตอบโดยไม่สัญญา SLA เกินกำลัง
 
 ทุกเคส support ควรบันทึก: category, browser/device, app version, reproduction steps, severity และ resolution โดยหลีกเลี่ยงการขอข้อมูลเอกสารลูกค้าเกินจำเป็น
+### Public Pilot channel — 2026-09-07
+- ช่องทางจริงสำหรับรอบ controlled Public Pilot: `https://github.com/Gutumrod/doccraft/issues`
+- การตอบเป็น best-effort และ **ไม่มี SLA** ในรอบ Pilot
+- ห้ามขอไฟล์เอกสารจริง/ข้อมูลลูกค้า/PromptPay identifier ถ้าไม่จำเป็นต่อการ reproduce ปัญหา
+- ก่อนขยาย Pilot ไปกลุ่มผู้ใช้ที่ไม่สะดวกใช้ GitHub ต้องเพิ่มช่องทาง support ที่เหมาะกับกลุ่มนั้นก่อน
 ## 4. Support Troubleshooting Matrix
 - **Draft missing:** ตรวจ browser/profile, storage availability, JSON backup; ห้าม claim ว่ากู้ local data ได้เสมอ (JSON export/import เป็น capability-hidden ตาม D-2026-09-03 — ห้ามสั่งผู้ใช้ใช้งาน UI ที่ซ่อนอยู่)
 - **Storage full/blocked:** รักษา in-memory state แล้วแจ้งผู้ใช้ให้ลด/ลบรูปตาม product flow เพื่อให้ autosave กลับมาทำงาน; Export JSON ไม่เป็น path ผู้ใช้เข้าถึงได้ใน V1 ตาม D-2026-09-03 (capability ยังมีแต่ไม่ถูก expose ใน UI)

@@ -57,3 +57,31 @@ Never infer production health from preview/local environment.
 Public Pilot เปิดได้เมื่อ Phase 6 Gate + support/onboarding + data notice + metrics + production smoke พร้อมทั้งหมด
 
 Paid launch ต้องผ่าน `SERVICE_OPERATIONS.md`, `COMMERCIAL_PACKAGING.md` และ `CUSTOMER_LIFECYCLE_AND_BILLING_POLICY.md` เพิ่มเติม
+
+## 9. Phase 6 Public Pilot Release Candidate Record — 2026-09-07
+
+Production target:
+- provider: Cloudflare Workers static assets
+- worker: `wstera-dc01`
+- URL: `https://dc01.wstera.com`
+- build: `pnpm build`
+- deploy: `pnpm build && pnpm dlx wrangler@4.129.0 deploy`
+- runtime bindings: none
+
+Verification at release-candidate preparation:
+- lint PASS
+- typecheck PASS
+- unit 147/147 PASS
+- Chrome E2E 42/42 PASS
+- Microsoft Edge E2E 42/42 PASS
+- production smoke PASS in Chrome + Edge
+- native production print evidence captured in Chrome + Edge
+- `git diff --check` PASS
+
+Rollback evidence:
+- known-good hardened version: `d0b116fb-84c9-42e7-b15b-122eb1762b55`
+- identical probe version: `468d1a08-cc06-472a-99aa-249db918344f`
+- real Wrangler rollback restored known-good version to 100% traffic
+- subsequent production HTTP check returned 200
+
+Gate state: READY FOR INDEPENDENT GATE 6 REVIEW; not closed by this implementation session. See `PHASE6_MVP_IMPLEMENTATION_EVIDENCE.md`.

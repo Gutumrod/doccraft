@@ -1,6 +1,6 @@
 # DocCraft — Implementation Plan
 
-> **Status:** Gates 1–5 PASS/CLOSED. Phase 5 / DC-SR-02 PromptPay Document QR closed on 2026-09-07 after Owner native-print acceptance, bounded HIGH remediation, 147/147 unit tests, 39/39 Chromium E2E, and independent re-review PASS. Phase 6 is next but NOT OPENED.
+> **Status:** Gates 1–5 PASS/CLOSED. Phase 6 builder work and production evidence are READY FOR INDEPENDENT GATE 6 REVIEW from baseline `2b4b9d18a76ab329e9228d41c94bbbf9f780fbee`; Gate 6 remains OPEN until independent PASS. Phase 7–9 remain frozen; after Gate 6 only Public Pilot / PV Gate is authorized.
 > **Date:** 2026-08-22
 > **Source of Truth:** `PRD.md` → `SYSTEM_ARCHITECTURE.md` → `ROADMAP.md` → `IMPLEMENTATION_PLAN.md`
 > **Role:** เอกสารนี้ขยาย execution detail ของ ROADMAP เท่านั้น ห้ามเปลี่ยน product scope, architecture boundary หรือ phase sequencing เอง

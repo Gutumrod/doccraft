@@ -4,6 +4,12 @@
 > **Date:** 2026-08-22
 > **Principle:** วัดพฤติกรรมที่จำเป็นต่อ product validation โดยลดการเก็บข้อมูลส่วนบุคคลให้มากที่สุด
 
+## 0. Public Pilot Collection Mode — 2026-09-07
+**Selected mode: No telemetry.** Public Pilot จะไม่ส่ง analytics/telemetry หรือข้อมูลเอกสารออกจาก browser โดยอัตโนมัติ
+
+เหตุผล: ลด privacy risk, ไม่เพิ่ม third-party dependency/fixed cost และเพียงพอกับ PV Gate รอบแรกที่ใช้ controlled pilot
+
+หลักฐานสำหรับ PV จะมาจาก manual observation, support cases, structured feedback/interviews และการติดตาม repeat usage แบบไม่เก็บเนื้อหาเอกสารลูกค้า
 ## 1. MVP Questions
 ต้องตอบให้ได้ว่า:
 - ผู้ใช้ไปถึง core outcome หรือไม่

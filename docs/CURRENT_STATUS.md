@@ -2,66 +2,63 @@
 
 **Product:** DocCraft (DC01)
 **Repository branch:** `master`
-**Phase 5 implementation baseline:** `15a58ccca221a9d568513f103b9d163cdc9dd382`
-**Working state:** Phase 5 implementation is uncommitted; Gate 5 is PASS / CLOSED after Owner native-print acceptance, bounded remediation, and independent re-review.
+**Phase 5 durable checkpoint:** `2b4b9d18a76ab329e9228d41c94bbbf9f780fbee`
+**Production:** `https://dc01.wstera.com`
+**Working state:** Phase 6 implementation and evidence are READY FOR INDEPENDENT GATE 6 REVIEW. Gate 6 remains OPEN until an independent reviewer returns PASS.
 **Purpose:** current-state overlay only; historical gate/evidence documents keep their own dated authority.
 
 ## Verified Current State
-Gate 1 through Gate 5 are closed. **Phase 5 / DC-SR-02 PromptPay Document QR is PASS / CLOSED** on 2026-09-07. Phase 6 remains unopened.
 
-Public Pilot V1 PromptPay contract is locked to:
-- mobile phone identifier
-- National ID / Tax ID 13 digits
-- amount mode: no fixed amount, deposit, or net payable
+Gates 1 through 5 are PASS / CLOSED. Phase 6 release implementation has completed its builder-side verification and production evidence pack.
 
-Identifier types outside that set, payment confirmation, slip verification, gateway/webhook, subscription billing, backend/auth/cloud sync, and server-side QR generation are outside this phase.
+Phase 6 completed evidence:
+- lint / typecheck / build PASS
+- unit tests 147/147 PASS
+- Chrome release E2E 42/42 PASS
+- Microsoft Edge release E2E 42/42 PASS
+- `git diff --check` PASS with CRLF warnings only
+- static production deploy to `dc01.wstera.com`
+- production smoke PASS in Chrome + Edge
+- no-login/no-backend/no-secret/no-PDF-engine boundary verified
+- native production print evidence captured for Chrome + Edge
+- actual production rollback exercise completed successfully
+- PRD V1 acceptance matrix recorded in `PHASE6_MVP_IMPLEMENTATION_EVIDENCE.md`
+## Production Release Candidate Evidence
 
-## Phase 5 Implementation State
-- canonical schema advanced from v3 to v4
-- `payment.promptPay` explicitly stores `enabled`, `identifierType`, `identifier`, and `amountMode`
-- migration chain is deterministic: v1 -> v2 -> v3 -> v4
-- legacy v3 documents migrate with PromptPay disabled by default
-- PromptPay normalization, validation, amount resolution, EMV payload, and CRC live in a separate domain module
-- calculation/tax/WHT/deposit engine remains PromptPay-agnostic
-- QR presentation uses validated payload only
-- invalid active PromptPay state fails closed and blocks print
-- hiding the Payment block preserves PromptPay data and removes it from print validity
-- PromptPay configuration survives local autosave/refresh and JSON export/import
-- amount formatting rejects scientific notation and positive values that round to `0.00`; payload builder also fails closed on invalid direct input
+Cloudflare Worker:
+- name: `wstera-dc01`
+- custom domain: `dc01.wstera.com`
+- current known-good production version: `d0b116fb-84c9-42e7-b15b-122eb1762b55`
+- rollback-probe version: `468d1a08-cc06-472a-99aa-249db918344f`
+- rollback was executed back to the known-good version and Wrangler restored it to 100% traffic
+- live production returns HTTP 200 with hardened response headers
 
-## Final Automated Verification
-- lint PASS
-- typecheck PASS
-- unit: 12 files / 147 tests PASS
-- production build PASS
-- Chromium E2E: 39/39 PASS
-- `git diff --check` PASS
-- PromptPay known static/dynamic payload + CRC vectors PASS
-- Phase 2–4.1 regression E2E remains green
+Public Pilot operational mode:
+- browser-local storage
+- no login
+- no cloud backup/sync
+- no application telemetry
+- Cloudflare-injected Insights beacon is blocked by production CSP
+- PromptPay QR is document instruction only, not payment confirmation
+- support: DocCraft GitHub Issues, best-effort / no SLA
 
-## Gate 5 Closure — 2026-09-07
-**GATE 5 — PASS / CLOSED**
+## Gate 6 Boundary
 
-Owner native Chrome preview/print acceptance: **PASS**
-- A4 selected in native Chrome print dialog
-- 1 sheet of paper
-- PromptPay QR remains readable and layout is intact
-- Owner confirmed the QR resolves to the correct PromptPay account and amount
+Gate 6 is **not closed by the builder/coordinator**.
 
-Independent review chronology:
-- initial independent review: `GATE 5 — REMEDIATE` due one HIGH amount-format edge case where scientific notation could enter EMV tag 54
-- bounded remediation added canonical decimal amount validation plus payload-builder defense-in-depth
-- post-remediation verification: 12 files / 147 unit tests PASS, 39/39 Chromium E2E PASS, lint/typecheck/build/diff-check PASS
-- independent re-review: `GATE 5 — PASS`; CRITICAL/HIGH/MEDIUM/LOW = none
+Remaining closure step:
+1. independent reviewer inspects the committed Phase 6 checkpoint and actual production evidence
+2. reviewer returns exactly `GATE 6 — PASS` or `GATE 6 — REMEDIATE`
 
-Evidence:
-- `GATE5_INDEPENDENT_REVIEW_2026-09-07.md`
-- `GATE5_REMEDIATION_EVIDENCE_2026-09-07.md`
-- `GATE5_INDEPENDENT_REREVIEW_2026-09-07.md`
-- `evidence/GATE5_PROMPTPAY_NATIVE_PRINT_OWNER_ACCEPTANCE_2026-09-07.png`
-
+Until PASS:
+- PV Gate is not started
+- Phase 7 / Supabase / Auth / Cloud sync remains frozen
+- Phase 8 billing remains frozen
+- Phase 9 post-MVP capability work remains frozen
 ## Next Action
-Phase 6 is the next roadmap phase but is **NOT OPENED** by this Gate 5 closure. Prepare/review the Phase 6 execution plan before any Phase 6 production-code changes.
+
+Independent Gate 6 review is next, using the durable Phase 6 pre-review checkpoint. Do not open Phase 7.
 
 ## Change Rule
+
 Update this file when branch/gate/runtime reality changes. Do not rewrite historical evidence to make an old result look current.

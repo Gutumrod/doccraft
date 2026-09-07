@@ -8,9 +8,10 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'msedge', use: { ...devices['Desktop Chrome'], channel: 'msedge' } },
   ],
   webServer: {
-    command: 'pnpm exec next start -p 3005 -H 127.0.0.1',
+    command: 'pnpm start -- --port 3005',
     url: 'http://127.0.0.1:3005',
     reuseExistingServer: false,
     timeout: 30000,

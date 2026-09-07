@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/serve-static.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "pnpm build && playwright test",
+    "deploy": "pnpm build && pnpm dlx wrangler@4.129.0 deploy"
   },
   "dependencies": {
     "next": "16.3.1",

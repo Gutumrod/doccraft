@@ -18,6 +18,7 @@ import type { StorageStatus } from '../../persistence/types';
 import { DocumentPreview } from '../preview/DocumentPreview';
 import { BlockVisibilityControls } from './BlockVisibilityControls';
 import { createInitialDocument } from './create-initial-document';
+import { PilotNotice } from './PilotNotice';
 import {
   addLineItem,
   removeLineItem,
@@ -182,7 +183,7 @@ export function DocCraftEditor() {
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <h1 className="text-sm sm:text-base font-bold text-slate-950 truncate">DocCraft</h1>
                 <span className="hidden sm:inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-800">
-                  Phase 4 Local-First
+                  Public Pilot
                 </span>
                 {/* Autosave Status Indicator */}
                 {storageStatus === 'saved' && (
@@ -328,6 +329,8 @@ export function DocCraftEditor() {
           </div>
         </div>
       </header>
+
+      <PilotNotice />
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
