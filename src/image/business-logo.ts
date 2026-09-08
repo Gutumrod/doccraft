@@ -11,6 +11,7 @@ import type { BusinessLogo } from '../domain/document/types';
  */
 
 export const BUSINESS_LOGO_MAX_DATA_URL_BYTES = 131_072;
+export const BUSINESS_LOGO_MAX_SOURCE_BYTES = 8 * 1024 * 1024;
 export const BUSINESS_LOGO_MAX_LONG_EDGE = 512;
 export const BUSINESS_LOGO_INITIAL_QUALITY = 0.85;
 export const BUSINESS_LOGO_MAX_ATTEMPTS = 4;
@@ -22,6 +23,7 @@ export const BUSINESS_LOGO_PERSISTED_TYPES = ['image/jpeg', 'image/webp'] as con
 
 export type BusinessLogoProcessingErrorCode =
   | 'UNSUPPORTED_TYPE'
+  | 'SOURCE_TOO_LARGE'
   | 'DECODE_FAILED'
   | 'ENCODE_FAILED'
   | 'TOO_LARGE';
@@ -227,6 +229,12 @@ function fitLogoWithinLongEdge(width: number, height: number): { width: number; 
 export async function processBusinessLogoFile(file: File): Promise<BusinessLogo> {
   if (!BUSINESS_LOGO_SOURCE_TYPES.includes(file.type as (typeof BUSINESS_LOGO_SOURCE_TYPES)[number])) {
     throw new BusinessLogoProcessingError('UNSUPPORTED_TYPE', 'รองรับเฉพาะไฟล์ JPEG, PNG หรือ WebP');
+  }
+  if (file.size <= 0 || file.size > BUSINESS_LOGO_MAX_SOURCE_BYTES) {
+    throw new BusinessLogoProcessingError(
+      'SOURCE_TOO_LARGE',
+      'ไฟล์โลโก้ต้องมีขนาดมากกว่า 0 และไม่เกิน 8 MiB ก่อนประมวลผล',
+    );
   }
 
   const decoded = await decodeLogoSource(file);

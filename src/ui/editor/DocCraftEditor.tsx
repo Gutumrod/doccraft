@@ -12,7 +12,11 @@ import {
   richThaiTextFixture,
   withItemImagesFixture,
 } from '../../domain/fixtures/representative-documents';
-import { exportDocumentAsJson, importDocumentFromJson } from '../../persistence/import-export';
+import {
+  exportDocumentAsJson,
+  importDocumentFromJson,
+  MAX_IMPORT_JSON_BYTES,
+} from '../../persistence/import-export';
 import { clearDraft, loadDraft, saveDraft } from '../../persistence/storage';
 import type { StorageStatus } from '../../persistence/types';
 import { DocumentPreview } from '../preview/DocumentPreview';
@@ -124,6 +128,10 @@ export function DocCraftEditor() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size <= 0 || file.size > MAX_IMPORT_JSON_BYTES) {
+      setImportError('⚠️ นำเข้าไฟล์ไม่สำเร็จ: ไฟล์ JSON ต้องมีขนาดมากกว่า 0 และไม่เกิน 16 MiB');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {

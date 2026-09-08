@@ -1,10 +1,32 @@
 import { chromium } from '@playwright/test';
 
 const target = process.env.DC01_URL || 'https://dc01.wstera.com';
+const targetUrl = new URL(target);
+const canonicalHost = targetUrl.host;
 const browsers = [
   ['chrome', 'chrome'],
   ['edge', 'msedge'],
 ];
+
+function assertSecurityHeaders(headers, label) {
+  const csp = headers['content-security-policy'] || '';
+  if (!csp.includes("script-src-attr 'none'")) throw new Error(`${label}: CSP missing script-src-attr 'none'`);
+  if (!csp.includes("frame-ancestors 'none'")) throw new Error(`${label}: CSP missing frame-ancestors 'none'`);
+  if (!csp.includes("connect-src 'self'")) throw new Error(`${label}: CSP missing connect-src 'self'`);
+  if (!(headers['strict-transport-security'] || '').includes('max-age=')) throw new Error(`${label}: HSTS missing`);
+  if ((headers['x-content-type-options'] || '').toLowerCase() !== 'nosniff') throw new Error(`${label}: nosniff missing`);
+  if ((headers['x-frame-options'] || '').toUpperCase() !== 'DENY') throw new Error(`${label}: X-Frame-Options DENY missing`);
+  if (!(headers['x-robots-tag'] || '').includes('noindex')) throw new Error(`${label}: X-Robots-Tag noindex missing`);
+}
+
+const httpTarget = new URL(target);
+httpTarget.protocol = 'http:';
+const redirectResponse = await fetch(httpTarget, { redirect: 'manual' });
+if (redirectResponse.status !== 308) throw new Error(`transport: expected HTTP 308, got ${redirectResponse.status}`);
+const redirectLocation = redirectResponse.headers.get('location');
+if (!redirectLocation || new URL(redirectLocation).protocol !== 'https:' || new URL(redirectLocation).host !== canonicalHost) {
+  throw new Error(`transport: invalid HTTPS redirect target: ${redirectLocation || 'missing'}`);
+}
 
 for (const [label, channel] of browsers) {
   const browser = await chromium.launch({ channel, headless: true });
@@ -15,16 +37,18 @@ for (const [label, channel] of browsers) {
 
   page.on('response', (response) => {
     const host = new URL(response.url()).host;
-    if (host && host !== 'dc01.wstera.com') thirdPartyResponses.add(host);
+    if (host && host !== canonicalHost) thirdPartyResponses.add(host);
   });
   page.on('requestfailed', (request) => {
     const host = new URL(request.url()).host;
     const reason = request.failure()?.errorText || 'failed';
-    if (host && host !== 'dc01.wstera.com') blockedThirdParty.add(`${host}:${reason}`);
+    if (host && host !== canonicalHost) blockedThirdParty.add(`${host}:${reason}`);
   });
 
   const response = await page.goto(target, { waitUntil: 'networkidle' });
   if (!response || response.status() !== 200) throw new Error(`${label}: expected HTTP 200`);
+  if (response.url().startsWith('http://')) throw new Error(`${label}: insecure final navigation URL`);
+  assertSecurityHeaders(await response.allHeaders(), label);
   if ((await page.title()) !== 'DocCraft') throw new Error(`${label}: wrong document title`);
 
   const pilotNotice = page.getByTestId('public-pilot-notice');

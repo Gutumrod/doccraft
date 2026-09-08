@@ -5,9 +5,11 @@
 > **Principle:** วัดพฤติกรรมที่จำเป็นต่อ product validation โดยลดการเก็บข้อมูลส่วนบุคคลให้มากที่สุด
 
 ## 0. Public Pilot Collection Mode — 2026-09-07
-**Selected mode: No telemetry.** Public Pilot จะไม่ส่ง analytics/telemetry หรือข้อมูลเอกสารออกจาก browser โดยอัตโนมัติ
+**Selected mode: No application telemetry.** Public Pilot จะไม่ให้ตัวแอป DocCraft ส่ง analytics/telemetry หรือข้อมูลเอกสารออกจาก browser โดยอัตโนมัติ
 
-เหตุผล: ลด privacy risk, ไม่เพิ่ม third-party dependency/fixed cost และเพียงพอกับ PV Gate รอบแรกที่ใช้ controlled pilot
+ขอบเขตคำว่า no telemetry ในเอกสารนี้หมายถึง **application-level telemetry ของ DocCraft** ไม่ได้หมายความว่าผู้ให้บริการโฮสติ้ง/เครือข่ายไม่มี operational access logs, security logs หรือ network reporting ของตนเอง
+
+เหตุผล: ลด privacy risk, ไม่เพิ่ม third-party analytics dependency/fixed cost และเพียงพอกับ PV Gate รอบแรกที่ใช้ controlled pilot
 
 หลักฐานสำหรับ PV จะมาจาก manual observation, support cases, structured feedback/interviews และการติดตาม repeat usage แบบไม่เก็บเนื้อหาเอกสารลูกค้า
 ## 1. MVP Questions

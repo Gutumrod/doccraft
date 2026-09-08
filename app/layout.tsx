@@ -4,6 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'DocCraft',
   description: 'Browser-first modular business document studio.',
+  robots: 'noindex, nofollow, noarchive',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

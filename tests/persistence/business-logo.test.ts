@@ -6,6 +6,7 @@ import {
   BUSINESS_LOGO_MAX_ATTEMPTS,
   BUSINESS_LOGO_MAX_DATA_URL_BYTES,
   BUSINESS_LOGO_MAX_LONG_EDGE,
+  BUSINESS_LOGO_MAX_SOURCE_BYTES,
   processBusinessLogoFile,
   validateBusinessLogoStructure,
 } from '../../src/image/business-logo';
@@ -165,6 +166,13 @@ describe('Phase 4.1 business logo validation and processing', () => {
     expect(logo.mimeType).toBe('image/jpeg');
     expect(runtime.fillRect).toHaveBeenCalled();
     expect(runtime.drawImage).toHaveBeenCalled();
+  });
+
+  it('rejects oversized source files before browser logo decoding', async () => {
+    const runtime = installLogoRuntime();
+    const oversizedFile = { type: 'image/png', size: BUSINESS_LOGO_MAX_SOURCE_BYTES + 1 } as File;
+    await expect(processBusinessLogoFile(oversizedFile)).rejects.toMatchObject({ code: 'SOURCE_TOO_LARGE' });
+    expect(runtime.decode).not.toHaveBeenCalled();
   });
 
   it('rejects unsupported, decode-failed, and oversize replacements without touching an accepted logo', async () => {

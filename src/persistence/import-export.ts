@@ -7,6 +7,8 @@ import {
   type PersistenceResult,
 } from './types';
 
+export const MAX_IMPORT_JSON_BYTES = 16 * 1024 * 1024;
+
 export function serializeDocumentForExport(document: DocCraftDocument): string {
   const envelope: ExportDocumentEnvelope = {
     app: 'DocCraft',
@@ -56,6 +58,12 @@ export function importDocumentFromJson(jsonString: string): PersistenceResult<Do
     return {
       ok: false,
       error: createPersistenceError('CORRUPTED_PAYLOAD', 'Import payload is empty or not a string'),
+    };
+  }
+  if (jsonString.length > MAX_IMPORT_JSON_BYTES) {
+    return {
+      ok: false,
+      error: createPersistenceError('CORRUPTED_PAYLOAD', 'Import payload exceeds the 16 MiB safety limit'),
     };
   }
 

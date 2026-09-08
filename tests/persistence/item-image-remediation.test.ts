@@ -7,6 +7,7 @@ import {
   ITEM_IMAGE_MAX_ATTEMPTS,
   ITEM_IMAGE_MAX_DATA_URL_BYTES,
   ITEM_IMAGE_MAX_LONG_EDGE,
+  ITEM_IMAGE_MAX_SOURCE_BYTES,
   processItemImageFile,
   validateItemImageStructure,
 } from '../../src/image/item-image';
@@ -280,6 +281,13 @@ describe('Phase 4 remediation — client image processing', () => {
   it('rejects unsupported type before decode/document mutation', async () => {
     const runtime = installImageRuntime();
     await expect(processItemImageFile(sourceFile('image/gif'))).rejects.toMatchObject({ code: 'UNSUPPORTED_TYPE' });
+    expect(runtime.decode).not.toHaveBeenCalled();
+  });
+
+  it('rejects oversized source files before browser image decoding', async () => {
+    const runtime = installImageRuntime();
+    const oversizedFile = { type: 'image/jpeg', size: ITEM_IMAGE_MAX_SOURCE_BYTES + 1 } as File;
+    await expect(processItemImageFile(oversizedFile)).rejects.toMatchObject({ code: 'SOURCE_TOO_LARGE' });
     expect(runtime.decode).not.toHaveBeenCalled();
   });
 

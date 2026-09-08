@@ -26,6 +26,17 @@ const contentTypes = new Map([
   ['.woff2', 'font/woff2'],
 ]);
 
+const localSecurityHeaders = {
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data:; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+  'Referrer-Policy': 'no-referrer',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Resource-Policy': 'same-origin',
+  'X-Robots-Tag': 'noindex, nofollow, noarchive',
+};
+
 function isInsideRoot(filePath) {
   const rel = relative(root, filePath);
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
@@ -58,6 +69,9 @@ const server = createServer(async (request, response) => {
     }
 
     const contentType = contentTypes.get(extname(filePath).toLowerCase()) ?? 'application/octet-stream';
+    for (const [name, value] of Object.entries(localSecurityHeaders)) {
+      response.setHeader(name, value);
+    }
     response.setHeader('Content-Type', contentType);
     response.setHeader('Cache-Control', filePath.endsWith('.html') ? 'no-cache' : 'public, max-age=31536000, immutable');
     createReadStream(filePath).pipe(response);

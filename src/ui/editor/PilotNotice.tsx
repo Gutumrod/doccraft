@@ -21,7 +21,8 @@ export function PilotNotice() {
               <ul className="mt-1 list-disc space-y-1 pl-5">
                 <li>เอกสารและรูปที่เพิ่มจะเก็บใน Browser Storage ของอุปกรณ์นี้เท่านั้น</li>
                 <li>หากล้างข้อมูลเว็บไซต์ เปลี่ยนเบราว์เซอร์ หรือเครื่องเสีย ข้อมูลอาจสูญหายได้</li>
-                <li>Public Pilot รอบนี้ไม่ส่ง analytics หรือ telemetry ออกจากเบราว์เซอร์</li>
+                <li>ตัวแอป DocCraft รอบนี้ไม่ส่ง analytics/telemetry หรือเนื้อหาเอกสารไปยังระบบวิเคราะห์ภายนอก</li>
+                <li>ผู้ให้บริการโฮสติ้ง/เครือข่ายอาจมี operational logs ตามการทำงานของบริการ โดยไม่ใช่ telemetry ที่ตัวแอป DocCraft ส่งเอง</li>
               </ul>
             </div>
             <div>

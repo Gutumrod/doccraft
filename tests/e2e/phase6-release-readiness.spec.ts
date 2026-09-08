@@ -8,7 +8,8 @@ test.describe('Phase 6 — Public Pilot release readiness', () => {
     await expect(notice).toBeVisible();
     await notice.locator('summary').click();
     await expect(notice).toContainText('ยังไม่มี Cloud Backup');
-    await expect(notice).toContainText('ไม่ส่ง analytics หรือ telemetry');
+    await expect(notice).toContainText('ตัวแอป DocCraft รอบนี้ไม่ส่ง analytics/telemetry');
+    await expect(notice).toContainText('operational logs');
     await expect(notice).toContainText('ไม่ได้ยืนยันว่าได้รับเงินจริงแล้ว');
 
     const support = notice.getByRole('link', { name: 'DocCraft GitHub Issues' });

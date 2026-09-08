@@ -1,6 +1,7 @@
 import type { ItemImage } from '../domain/document/types';
 
 export const ITEM_IMAGE_MAX_DATA_URL_BYTES = 262_144;
+export const ITEM_IMAGE_MAX_SOURCE_BYTES = 12 * 1024 * 1024;
 export const ITEM_IMAGE_MAX_LONG_EDGE = 960;
 export const ITEM_IMAGE_INITIAL_QUALITY = 0.82;
 export const ITEM_IMAGE_MAX_ATTEMPTS = 4;
@@ -12,6 +13,7 @@ export const ITEM_IMAGE_PERSISTED_TYPES = ['image/jpeg', 'image/webp'] as const;
 
 export type ItemImageProcessingErrorCode =
   | 'UNSUPPORTED_TYPE'
+  | 'SOURCE_TOO_LARGE'
   | 'DECODE_FAILED'
   | 'ENCODE_FAILED'
   | 'TOO_LARGE';
@@ -208,6 +210,12 @@ function fitWithinLongEdge(width: number, height: number): { width: number; heig
 export async function processItemImageFile(file: File): Promise<ItemImage> {
   if (!ITEM_IMAGE_SOURCE_TYPES.includes(file.type as (typeof ITEM_IMAGE_SOURCE_TYPES)[number])) {
     throw new ItemImageProcessingError('UNSUPPORTED_TYPE', 'รองรับเฉพาะไฟล์ JPEG, PNG หรือ WebP');
+  }
+  if (file.size <= 0 || file.size > ITEM_IMAGE_MAX_SOURCE_BYTES) {
+    throw new ItemImageProcessingError(
+      'SOURCE_TOO_LARGE',
+      'ไฟล์รูปต้องมีขนาดมากกว่า 0 และไม่เกิน 12 MiB ก่อนประมวลผล',
+    );
   }
 
   const decoded = await decodeImage(file);

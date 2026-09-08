@@ -5,6 +5,7 @@ import { onePageQuotationFixture } from '../../src/domain/fixtures/representativ
 import {
   exportDocumentAsJson,
   importDocumentFromJson,
+  MAX_IMPORT_JSON_BYTES,
   serializeDocumentForExport,
 } from '../../src/persistence/import-export';
 import { migrateExportEnvelope, migratePersistedEnvelope } from '../../src/persistence/migration';
@@ -500,6 +501,15 @@ describe('Phase 4 — Local Persistence, Migration & Backup Unit Tests', () => {
       expect(importRes.ok).toBe(false);
       if (!importRes.ok) {
         expect(importRes.error.code).toBe('CORRUPTED_PAYLOAD');
+      }
+    });
+
+    it('rejects JSON payloads above the import safety limit before parsing', () => {
+      const importRes = importDocumentFromJson('x'.repeat(MAX_IMPORT_JSON_BYTES + 1));
+      expect(importRes.ok).toBe(false);
+      if (!importRes.ok) {
+        expect(importRes.error.code).toBe('CORRUPTED_PAYLOAD');
+        expect(importRes.error.message).toContain('16 MiB');
       }
     });
 

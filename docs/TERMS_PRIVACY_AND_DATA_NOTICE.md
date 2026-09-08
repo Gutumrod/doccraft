@@ -27,7 +27,7 @@ DocCraft เป็นเครื่องมือสร้างเอกส�
 
 ห้ามส่ง document contents, customer names, tax IDs, addresses, PromptPay identifiers หรือ free-text notes ไป analytics โดย default.
 
-ถ้า V1 ไม่มี telemetry จริง ต้องไม่แสดงข้อความว่าเก็บ analytics.
+ถ้า V1 ไม่มี application telemetry จริง ต้องไม่แสดงข้อความว่า DocCraft เก็บ analytics. คำว่า no telemetry ต้องไม่ตีความรวมถึง operational access/security/network logs ที่ผู้ให้บริการโฮสติ้งหรือเครือข่ายอาจมีตามบริการของตน.
 
 ## 5. Support Data
 เมื่อผู้ใช้ติดต่อ support ให้เก็บเฉพาะข้อมูลที่จำเป็นต่อการวิเคราะห์ปัญหา และหลีกเลี่ยงการขอไฟล์เอกสารจริง/ข้อมูลส่วนบุคคลเมื่อ reproduction ด้วยข้อมูลตัวอย่างเพียงพอ.
