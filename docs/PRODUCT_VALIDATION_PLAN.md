@@ -1,8 +1,10 @@
 # DocCraft — Product Validation Plan
 
-> **Status:** Pre-Pilot Validation Contract — D0 Approved Baseline
+> **Status:** Public Pilot / PV Gate OPENED 2026-09-08 — validation contract active
 > **Date:** 2026-08-22
 > **Purpose:** กำหนดว่าต้องเรียนรู้อะไรจาก Free MVP/Pilot ก่อนลงทุนใน Cloud/Pro
+
+**Execution amendment — 2026-09-08:** Gate 6 is PASS/CLOSED and the Public Pilot / PV Gate is now open for real-user evidence collection. Execution details and privacy-safe evidence templates are in `BRIEF-public-pilot-pv-gate-2026-09-08.md`, `PUBLIC_PILOT_EVIDENCE_LOG.md`, `PUBLIC_PILOT_INTERVIEW_GUIDE.md`, and `PV_GATE_DECISION_TEMPLATE.md`. Phase 7 remains frozen until PV Gate = PASS and explicit Owner authorization.
 
 ## 1. Validation Objective
 พิสูจน์ว่ากลุ่มเป้าหมายใช้ DocCraft ทำเอกสารจริงซ้ำ และระบุ pain ที่มีมูลค่าพอให้สร้าง paid capability ต่อ

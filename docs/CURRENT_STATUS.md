@@ -1,11 +1,11 @@
-# Current Status - 2026-09-07
+# Current Status - 2026-09-08
 
 **Product:** DocCraft (DC01)
 **Repository branch:** `master`
 **Phase 5 durable checkpoint:** `2b4b9d18a76ab329e9228d41c94bbbf9f780fbee`
 **Reviewed Phase 6 implementation:** `01115cc908adcbc4224d3d7878f8680da287439e`
 **Production:** `https://dc01.wstera.com`
-**Working state:** Gates 1–6 are PASS / CLOSED. Independent Gate 6 review returned `GATE 6 — PASS`. Public Pilot / PV Gate is the next authorized stage.
+**Working state:** Gates 1–6 are PASS / CLOSED. Public Pilot / PV Gate was OPENED on 2026-09-08 for real-user evidence collection. No external real-user PV evidence is recorded yet; Phase 7 remains frozen.
 **Purpose:** current-state overlay only; historical gate/evidence documents keep their own dated authority.
 
 ## Verified Current State
@@ -60,9 +60,18 @@ Public Pilot follow-up / non-blocking:
 - M-3 — evidence pack does not preserve raw Wrangler dry-run / rollback / deployments-list transcripts
 - M-4 — Chrome may use the printer default Paper size (for example Letter) even when print CSS declares A4
 
-## Next Action
+## Public Pilot / PV Gate — Opened 2026-09-08
 
-Begin Public Pilot / PV Gate execution. Phase 7 / Supabase / Auth / Cloud sync, Phase 8 billing, and Phase 9 post-MVP capabilities remain frozen until PV Gate = PASS.
+Execution contract: `BRIEF-public-pilot-pv-gate-2026-09-08.md`.
+
+Canonical evidence collection:
+- `PUBLIC_PILOT_EVIDENCE_LOG.md`
+- `PUBLIC_PILOT_INTERVIEW_GUIDE.md`
+- `PV_GATE_DECISION_TEMPLATE.md`
+
+Current evidence state: no external real-user participant has been recorded yet. The next action is to onboard real participants across the three required segments and append observed evidence. Do not infer PV PASS from Owner/internal testing.
+
+Phase 7 / Supabase / Auth / Cloud sync, Phase 8 billing, and Phase 9 post-MVP capabilities remain frozen until PV Gate = PASS and Owner authorizes the next phase.
 
 ## Change Rule
 
