@@ -5,7 +5,7 @@
 **Phase 5 durable checkpoint:** `2b4b9d18a76ab329e9228d41c94bbbf9f780fbee`
 **Reviewed Phase 6 implementation:** `01115cc908adcbc4224d3d7878f8680da287439e`
 **Production:** `https://dc01.wstera.com`
-**Working state:** Gates 1–6 are PASS / CLOSED. Public Pilot / PV Gate was OPENED on 2026-09-08 for real-user evidence collection. No external real-user PV evidence is recorded yet; Phase 7 remains frozen.
+**Working state:** Gates 1–6 are PASS / CLOSED. Public Pilot / PV Gate is OPEN for real-user evidence collection, but `PILOT-001` is temporarily HOLD while Owner-directed adversarial security validation is completed. Baseline Public Pilot hardening PASS on 2026-09-08; Phase 7 remains frozen.
 **Purpose:** current-state overlay only; historical gate/evidence documents keep their own dated authority.
 
 ## Verified Current State
@@ -29,10 +29,11 @@ Phase 6 completed evidence:
 Cloudflare Worker:
 - name: `wstera-dc01`
 - custom domain: `dc01.wstera.com`
-- current known-good production version: `d0b116fb-84c9-42e7-b15b-122eb1762b55`
+- Gate 6 known-good version at closure: `d0b116fb-84c9-42e7-b15b-122eb1762b55`
+- current Public Pilot security version: `722b573b-8dbb-4a50-b1ea-d880f6a03a5b`
 - rollback-probe version: `468d1a08-cc06-472a-99aa-249db918344f`
 - rollback was executed back to the known-good version and Wrangler restored it to 100% traffic
-- live production returns HTTP 200 with hardened response headers
+- live HTTPS production returns HTTP 200 with hardened response headers; HTTP requests redirect 308 to HTTPS
 
 Public Pilot operational mode:
 - browser-local storage
@@ -59,6 +60,21 @@ Public Pilot follow-up / non-blocking:
 - M-2 — production smoke does not directly assert security headers
 - M-3 — evidence pack does not preserve raw Wrangler dry-run / rollback / deployments-list transcripts
 - M-4 — Chrome may use the printer default Paper size (for example Letter) even when print CSS declares A4
+
+## Public Pilot Security Hardening — 2026-09-08
+
+Canonical evidence: `PUBLIC_PILOT_SECURITY_READINESS_2026-09-08.md`.
+
+- security implementation checkpoint: `fb34f055180015124ac190c36f5728dd681d21f0`
+- production Worker version: `722b573b-8dbb-4a50-b1ea-d880f6a03a5b`
+- HTTP application and static-asset paths redirect `308` to HTTPS
+- HSTS/CSP/anti-framing/noindex/security headers verified on production
+- edge gateway rejects methods other than GET/HEAD with `405`
+- Vitest critical advisory remediated by upgrade to `3.2.6`; full and production audits report no known vulnerabilities
+- source upload and JSON import resource guards added before expensive processing
+- lint/typecheck/build PASS; unit 150/150; Chrome 42/42; Edge 42/42; production smoke PASS in both browsers
+
+Gate 6 remains historically PASS/CLOSED. This hardening work resolves the substance of Gate 6 follow-up M-1/M-2 without reopening the gate. M-3/M-4 remain historical findings. Adversarial/destructive security validation is next; no external Pilot participant should be enrolled until that round is reviewed.
 
 ## Public Pilot / PV Gate — Opened 2026-09-08
 

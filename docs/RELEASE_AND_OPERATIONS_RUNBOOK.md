@@ -85,3 +85,30 @@ Rollback evidence:
 - subsequent production HTTP check returned 200
 
 Gate 6 closure — 2026-09-07: **PASS / CLOSED** after independent review of implementation checkpoint `01115cc908adcbc4224d3d7878f8680da287439e`. Canonical verdict: `GATE6_INDEPENDENT_REVIEW_2026-09-07.md`. Next authorized stage is Public Pilot / PV Gate; Phase 7 remains frozen until PV Gate = PASS.
+
+## 10. Public Pilot Security Hardening Amendment — 2026-09-08
+
+Security implementation checkpoint: `fb34f055180015124ac190c36f5728dd681d21f0`.
+
+Current production security deployment:
+- Worker: `wstera-dc01`
+- version: `722b573b-8dbb-4a50-b1ea-d880f6a03a5b`
+- runtime binding: `ASSETS`
+- `run_worker_first: true`, so application and static asset paths pass through the security gateway
+- HTTP is redirected with `308` to the same HTTPS path/query
+- gateway accepts only GET/HEAD; other methods return `405`
+- HSTS/CSP/anti-framing/noindex and related response headers are applied at the edge
+
+Verification:
+- lint / typecheck / build PASS
+- unit 150/150 PASS
+- Chromium 42/42 PASS
+- Microsoft Edge 42/42 PASS
+- full dependency audit: no known vulnerabilities
+- production smoke PASS in Chrome + Edge
+- HTTP root and static asset probes both return `308` to HTTPS
+- sensitive source/config probes return `404`
+
+Immediate pre-final-gateway version `01c4d9d4-45ab-4050-9b87-f789ed386077` is retained as an availability rollback point, but reintroduces the known HTTP static-asset residual and is not the preferred steady-state security posture.
+
+Canonical evidence: `PUBLIC_PILOT_SECURITY_READINESS_2026-09-08.md`. Adversarial/destructive validation is the next security activity before onboarding `PILOT-001`.
