@@ -69,3 +69,18 @@ Choose one:
 - ☐ `OWNER POST BLOCKED` — core create/preview/persist/print flow failed
 
 Owner POST is product-quality evidence. Final pilot/security decision still requires closure/disposition of remaining security items.
+
+## GO — Production Entry Gate Passed
+
+Recorded before Owner test:
+- deployed source commit: `8c29254`
+- HTTP redirect Worker version: `8d271814-327b-48b7-9ba6-3b314f9b6aa0`
+- DocCraft production version: `10063532-44e1-4f57-951e-69c171e4ad03`
+- dependency audit: `0 vulnerabilities`
+- production smoke: `PASS` — Chrome + Edge
+- bounded edge adversarial retest: `PASS`
+- bounded browser adversarial retest: `PASS`
+- clean-load/browser pageerror gate: `PASS / PAGE_ERRORS=[]`
+
+**Owner POST status: GO.**
+Run the Desktop Test and Phone Test sections above against `https://dc01.wstera.com`.

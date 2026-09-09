@@ -94,3 +94,25 @@ Fresh post-hardening rerun:
 
 **Updated local verdict: ROUND 2 CANDIDATE PASS.**
 Production remains pending because this candidate is not yet deployed and the current Wrangler shell has no authenticated approved production identity. F-02/F-05/F-06 remain open/disposition items as described in the summary.
+
+## Production POST Execution — 2026-09-09
+
+Deployed source commit: `8c29254`
+
+Cloudflare deployments:
+- HTTP redirect Worker version: `8d271814-327b-48b7-9ba6-3b314f9b6aa0`
+- DocCraft production version: `10063532-44e1-4f57-951e-69c171e4ad03`
+
+Fresh live evidence after deployment:
+- production smoke: PASS — Chrome + Edge
+- HTTP root/static/path-query redirect: PASS — 308 to canonical HTTPS
+- edge adversarial suite: `ROUND1_EDGE_PASS`
+- browser adversarial suite: `ROUND1_BROWSER_PASS`
+- browser page errors: `PAGE_ERRORS=[]`
+- React `#418` seen on the previous production artifact did not reproduce after this deploy
+- CSP hashes are live; broad `script-src 'unsafe-inline'` is absent
+- sensitive path probes remain non-exposed
+- unsafe HTTP methods remain rejected with 405
+
+**Automated production POST verdict: PASS.**
+Owner manual POST may now begin. F-02/F-05/F-06 remain governance/disposition items and do not become silently closed by this deployment.

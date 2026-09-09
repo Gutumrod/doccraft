@@ -65,3 +65,30 @@ The `sharp` and `js-yaml` pins live in `pnpm-workspace.yaml` because pnpm 11 no 
 6. Compare POST against the already-closed PRE baseline and issue the final pilot/security verdict.
 
 `PILOT-001` remains HOLD until production POST and remaining security dispositions are complete. Phase 7 remains frozen.
+
+## Production POST Update — 2026-09-09
+
+Round 2 is now deployed to production.
+
+Deployment evidence:
+- source commit: `8c29254`
+- redirect Worker: `8d271814-327b-48b7-9ba6-3b314f9b6aa0`
+- main DocCraft deployment: `10063532-44e1-4f57-951e-69c171e4ad03`
+
+Post-deploy automated result:
+- production smoke PASS on Chrome and Edge
+- HTTP→HTTPS canonical redirect PASS
+- edge adversarial PASS
+- browser adversarial PASS
+- `PAGE_ERRORS=[]`
+- prior production React `#418` no longer reproduces
+- live CSP uses generated script hashes and no broad inline-script allowance
+
+**Current verdict: AUTOMATED PRODUCTION POST PASS / OWNER MANUAL POST READY.**
+
+Remaining non-Owner items:
+- F-02 TLS legacy-protocol disposition remains House-owned
+- F-05 dedicated least-privilege deploy identity remains governance work; this deployment used the authenticated account OAuth profile
+- F-06 repository protection is still partial until required status checks/ruleset disposition is closed
+
+Owner should now execute `OWNER_MANUAL_TEST_POST_2026-09-09.md`. Final pilot verdict follows Owner evidence plus remaining security/governance disposition.
