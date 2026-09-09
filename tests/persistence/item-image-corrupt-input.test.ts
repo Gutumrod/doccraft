@@ -6,7 +6,7 @@ afterEach(() => {
 });
 
 describe('Phase 4 remediation — corrupted image input', () => {
-  it('rejects an undecodable file with a supported MIME type before any state update can occur', async () => {
+  it('rejects a corrupt supported-MIME file at header inspection before browser decode', async () => {
     const decode = vi.fn(async () => {
       throw new Error('corrupt image data');
     });
@@ -20,8 +20,8 @@ describe('Phase 4 remediation — corrupted image input', () => {
     });
 
     await expect(processItemImageFile(corruptJpeg)).rejects.toMatchObject({
-      code: 'DECODE_FAILED',
+      code: 'SOURCE_FORMAT_INVALID',
     });
-    expect(decode).toHaveBeenCalledTimes(1);
+    expect(decode).not.toHaveBeenCalled();
   });
 });

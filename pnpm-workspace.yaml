@@ -1,3 +1,7 @@
 allowBuilds:
   esbuild: true
   unrs-resolver: true
+
+overrides:
+  sharp: 0.35.4
+  js-yaml: 4.3.2

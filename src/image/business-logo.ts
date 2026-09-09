@@ -1,4 +1,5 @@
 import type { BusinessLogo } from '../domain/document/types';
+import { inspectImageSource } from './source-inspection';
 
 /**
  * Business logo (Phase 4.1) client-side image pipeline.
@@ -24,6 +25,8 @@ export const BUSINESS_LOGO_PERSISTED_TYPES = ['image/jpeg', 'image/webp'] as con
 export type BusinessLogoProcessingErrorCode =
   | 'UNSUPPORTED_TYPE'
   | 'SOURCE_TOO_LARGE'
+  | 'SOURCE_DIMENSIONS_EXCEEDED'
+  | 'SOURCE_FORMAT_INVALID'
   | 'DECODE_FAILED'
   | 'ENCODE_FAILED'
   | 'TOO_LARGE';
@@ -235,6 +238,17 @@ export async function processBusinessLogoFile(file: File): Promise<BusinessLogo>
       'SOURCE_TOO_LARGE',
       'ไฟล์โลโก้ต้องมีขนาดมากกว่า 0 และไม่เกิน 8 MiB ก่อนประมวลผล',
     );
+  }
+
+  const sourceInspection = await inspectImageSource(
+    file,
+    file.type as 'image/jpeg' | 'image/png' | 'image/webp',
+  );
+  if (!sourceInspection.ok) {
+    const code = sourceInspection.message.includes('ขอบเขตความปลอดภัย')
+      ? 'SOURCE_DIMENSIONS_EXCEEDED'
+      : 'SOURCE_FORMAT_INVALID';
+    throw new BusinessLogoProcessingError(code, sourceInspection.message);
   }
 
   const decoded = await decodeLogoSource(file);

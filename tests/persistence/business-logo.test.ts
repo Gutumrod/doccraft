@@ -113,8 +113,33 @@ function installLogoRuntime(options?: {
   return { close, decode, drawImage, fillRect, toDataURL };
 }
 
-function sourceFile(type: string, contents = Uint8Array.of(1, 2, 3)) {
-  return new File([contents], 'logo.fixture', { type });
+function sourceBytes(type: string, width = 100, height = 100) {
+  if (type === 'image/png') {
+    const bytes = new Uint8Array(24);
+    bytes.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0);
+    bytes.set([0x49, 0x48, 0x44, 0x52], 12);
+    const view = new DataView(bytes.buffer);
+    view.setUint32(16, width);
+    view.setUint32(20, height);
+    return bytes;
+  }
+  if (type === 'image/jpeg') {
+    return Uint8Array.from([0xff,0xd8,0xff,0xc0,0x00,0x11,0x08,(height>>8)&0xff,height&0xff,(width>>8)&0xff,width&0xff,0x03,0x01,0x11,0x00,0x02,0x11,0x00,0x03,0x11,0x00,0xff,0xd9]);
+  }
+  if (type === 'image/webp') {
+    const bytes = new Uint8Array(30);
+    bytes.set([...Buffer.from('RIFF'), 22, 0, 0, 0, ...Buffer.from('WEBPVP8X'), 10, 0, 0, 0], 0);
+    const w = width - 1, h = height - 1;
+    bytes.set([w & 0xff, (w >> 8) & 0xff, (w >> 16) & 0xff], 24);
+    bytes.set([h & 0xff, (h >> 8) & 0xff, (h >> 16) & 0xff], 27);
+    return bytes;
+  }
+  return Uint8Array.of(1, 2, 3);
+}
+
+function sourceFile(type: string, contents?: Uint8Array) {
+  const bytes = Uint8Array.from(contents ?? sourceBytes(type));
+  return new File([bytes.buffer], 'logo.fixture', { type });
 }
 
 afterEach(() => {

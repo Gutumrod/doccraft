@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, isAbsolute, join, relative, resolve } from 'node:path';
 
@@ -26,16 +26,21 @@ const contentTypes = new Map([
   ['.woff2', 'font/woff2'],
 ]);
 
-const localSecurityHeaders = {
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data:; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
-  'Referrer-Policy': 'no-referrer',
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Cross-Origin-Opener-Policy': 'same-origin',
-  'Cross-Origin-Resource-Policy': 'same-origin',
-  'X-Robots-Tag': 'noindex, nofollow, noarchive',
-};
+function parseGeneratedHeaders(source) {
+  const headers = {};
+  for (const line of source.split(/\r?\n/)) {
+    const match = line.match(/^\s{2}([^:]+):\s*(.+)$/);
+    if (match) headers[match[1]] = match[2];
+  }
+  return headers;
+}
+
+const localSecurityHeaders = parseGeneratedHeaders(
+  await readFile(join(root, '_headers'), 'utf8'),
+);
+if (!localSecurityHeaders['Content-Security-Policy']) {
+  throw new Error('Generated out/_headers is missing Content-Security-Policy');
+}
 
 function isInsideRoot(filePath) {
   const rel = relative(root, filePath);

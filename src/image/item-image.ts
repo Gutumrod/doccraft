@@ -1,4 +1,5 @@
 import type { ItemImage } from '../domain/document/types';
+import { inspectImageSource } from './source-inspection';
 
 export const ITEM_IMAGE_MAX_DATA_URL_BYTES = 262_144;
 export const ITEM_IMAGE_MAX_SOURCE_BYTES = 12 * 1024 * 1024;
@@ -14,6 +15,8 @@ export const ITEM_IMAGE_PERSISTED_TYPES = ['image/jpeg', 'image/webp'] as const;
 export type ItemImageProcessingErrorCode =
   | 'UNSUPPORTED_TYPE'
   | 'SOURCE_TOO_LARGE'
+  | 'SOURCE_DIMENSIONS_EXCEEDED'
+  | 'SOURCE_FORMAT_INVALID'
   | 'DECODE_FAILED'
   | 'ENCODE_FAILED'
   | 'TOO_LARGE';
@@ -216,6 +219,17 @@ export async function processItemImageFile(file: File): Promise<ItemImage> {
       'SOURCE_TOO_LARGE',
       'ไฟล์รูปต้องมีขนาดมากกว่า 0 และไม่เกิน 12 MiB ก่อนประมวลผล',
     );
+  }
+
+  const sourceInspection = await inspectImageSource(
+    file,
+    file.type as 'image/jpeg' | 'image/png' | 'image/webp',
+  );
+  if (!sourceInspection.ok) {
+    const code = sourceInspection.message.includes('ขอบเขตความปลอดภัย')
+      ? 'SOURCE_DIMENSIONS_EXCEEDED'
+      : 'SOURCE_FORMAT_INVALID';
+    throw new ItemImageProcessingError(code, sourceInspection.message);
   }
 
   const decoded = await decodeImage(file);

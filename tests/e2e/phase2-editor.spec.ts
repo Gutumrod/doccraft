@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './test-fixtures';
 
 test.describe('Phase 2 — DocCraft Editor + Modular Blocks E2E', () => {
   test.beforeEach(async ({ page }) => {

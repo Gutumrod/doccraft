@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './test-fixtures';
 
 test.describe('Phase 4 — Local Persistence + JSON Backup E2E', () => {
   test.beforeEach(async ({ page }) => {

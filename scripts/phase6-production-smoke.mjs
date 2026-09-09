@@ -11,6 +11,8 @@ const browsers = [
 function assertSecurityHeaders(headers, label) {
   const csp = headers['content-security-policy'] || '';
   if (!csp.includes("script-src-attr 'none'")) throw new Error(`${label}: CSP missing script-src-attr 'none'`);
+  if (csp.includes("script-src 'self' 'unsafe-inline'")) throw new Error(`${label}: CSP broadly allows inline scripts`);
+  if (!csp.includes("'sha256-")) throw new Error(`${label}: CSP missing generated inline-script hashes`);
   if (!csp.includes("frame-ancestors 'none'")) throw new Error(`${label}: CSP missing frame-ancestors 'none'`);
   if (!csp.includes("connect-src 'self'")) throw new Error(`${label}: CSP missing connect-src 'self'`);
   if (!(headers['strict-transport-security'] || '').includes('max-age=')) throw new Error(`${label}: HSTS missing`);

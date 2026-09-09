@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './test-fixtures';
 
 test.describe('Phase 6 — Public Pilot release readiness', () => {
   test('publishes the local-first Public Pilot notice and real support entry point', async ({ page }) => {
