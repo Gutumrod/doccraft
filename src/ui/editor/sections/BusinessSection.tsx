@@ -236,7 +236,13 @@ export function BusinessSection({
             <button
               type="button"
               data-testid="biz-branch-headoffice"
-              onClick={() => onUpdateBusiness({ branchType: 'head_office', branchNumber: '' })}
+              onClick={() =>
+                onUpdateBusiness(
+                  business.branchType === 'head_office'
+                    ? { branchType: undefined, branchNumber: '' }
+                    : { branchType: 'head_office', branchNumber: '' },
+                )
+              }
               className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
                 business.branchType === 'head_office'
                   ? 'border-indigo-600 bg-indigo-50 text-indigo-950 font-bold'
@@ -248,7 +254,13 @@ export function BusinessSection({
             <button
               type="button"
               data-testid="biz-branch-subbranch"
-              onClick={() => onUpdateBusiness({ branchType: 'branch', branchNumber: business.branchNumber || '' })}
+              onClick={() =>
+                onUpdateBusiness(
+                  business.branchType === 'branch'
+                    ? { branchType: undefined, branchNumber: '' }
+                    : { branchType: 'branch', branchNumber: business.branchNumber || '' },
+                )
+              }
               className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
                 business.branchType === 'branch'
                   ? 'border-indigo-600 bg-indigo-50 text-indigo-950 font-bold'

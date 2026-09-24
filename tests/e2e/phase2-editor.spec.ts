@@ -44,6 +44,39 @@ test.describe('Phase 2 — DocCraft Editor + Modular Blocks E2E', () => {
     await expect(page.getByTestId('preview-doc-number')).toHaveText('KMO-2026-091');
   });
 
+  test('1b. business and customer branch selections can be cleared by clicking the active choice again', async ({ page }) => {
+    const bizHeadOffice = page.getByTestId('biz-branch-headoffice');
+    const bizBranch = page.getByTestId('biz-branch-subbranch');
+    const custHeadOffice = page.getByTestId('cust-branch-headoffice');
+    const custBranch = page.getByTestId('cust-branch-subbranch');
+
+    await bizHeadOffice.click();
+    await expect(bizHeadOffice).toHaveClass(/border-indigo-600/);
+    await bizHeadOffice.click();
+    await expect(bizHeadOffice).not.toHaveClass(/border-indigo-600/);
+
+    await bizBranch.click();
+    await page.getByTestId('input-biz-branch-number').fill('00001');
+    await bizBranch.click();
+    await expect(bizBranch).not.toHaveClass(/border-indigo-600/);
+    await expect(page.getByTestId('input-biz-branch-number')).toHaveCount(0);
+    await bizBranch.click();
+    await expect(page.getByTestId('input-biz-branch-number')).toHaveValue('');
+
+    await custHeadOffice.click();
+    await expect(custHeadOffice).toHaveClass(/border-indigo-600/);
+    await custHeadOffice.click();
+    await expect(custHeadOffice).not.toHaveClass(/border-indigo-600/);
+
+    await custBranch.click();
+    await page.getByTestId('input-cust-branch-number').fill('00002');
+    await custBranch.click();
+    await expect(custBranch).not.toHaveClass(/border-indigo-600/);
+    await expect(page.getByTestId('input-cust-branch-number')).toHaveCount(0);
+    await custBranch.click();
+    await expect(page.getByTestId('input-cust-branch-number')).toHaveValue('');
+  });
+
   test('2. add a second line, apply discount and see live totals update', async ({ page }) => {
     // Start from an explicit zero-value placeholder, then enter a real amount.
     await expect(page.getByTestId('summary-subtotal')).toContainText('0.00');

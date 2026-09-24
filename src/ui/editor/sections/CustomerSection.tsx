@@ -82,7 +82,13 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
             <button
               type="button"
               data-testid="cust-branch-headoffice"
-              onClick={() => onUpdateCustomer({ branchType: 'head_office', branchNumber: '' })}
+              onClick={() =>
+                onUpdateCustomer(
+                  customer.branchType === 'head_office'
+                    ? { branchType: undefined, branchNumber: '' }
+                    : { branchType: 'head_office', branchNumber: '' },
+                )
+              }
               className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
                 customer.branchType === 'head_office'
                   ? 'border-indigo-600 bg-indigo-50 text-indigo-950 font-bold'
@@ -94,7 +100,13 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
             <button
               type="button"
               data-testid="cust-branch-subbranch"
-              onClick={() => onUpdateCustomer({ branchType: 'branch', branchNumber: customer.branchNumber || '' })}
+              onClick={() =>
+                onUpdateCustomer(
+                  customer.branchType === 'branch'
+                    ? { branchType: undefined, branchNumber: '' }
+                    : { branchType: 'branch', branchNumber: customer.branchNumber || '' },
+                )
+              }
               className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
                 customer.branchType === 'branch'
                   ? 'border-indigo-600 bg-indigo-50 text-indigo-950 font-bold'
