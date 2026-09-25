@@ -12,7 +12,7 @@ page.on('response', (response) => {
   if (response.url().includes('evil.example')) responses.push(response.url());
 });
 page.on('console', (message) => logs.push(message.text()));
-await page.goto('https://dc01.wstera.com', { waitUntil: 'networkidle' });
+await page.goto(process.env.DC01_URL || 'https://doccraft.wstera.com', { waitUntil: 'networkidle' });
 await page.evaluate(() => {
   const script = document.createElement('script');
   script.textContent = 'window.__inlineCspProbe=7';

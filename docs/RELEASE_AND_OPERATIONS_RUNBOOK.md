@@ -112,3 +112,28 @@ Verification:
 Immediate pre-final-gateway version `01c4d9d4-45ab-4050-9b87-f789ed386077` is retained as an availability rollback point, but reintroduces the known HTTP static-asset residual and is not the preferred steady-state security posture.
 
 Canonical evidence: `PUBLIC_PILOT_SECURITY_READINESS_2026-09-08.md`. Adversarial/destructive validation is the next security activity before onboarding `PILOT-001`.
+
+## 11. Public Hostname Migration Amendment — 2026-09-25
+
+Canonical host ตาม policy `<public_slug>.wstera.com`: **`https://doccraft.wstera.com`** — `DC01` ยังเป็น internal code เหมือนเดิม
+หลักฐานเต็ม: `docs/HOSTNAME_MIGRATION_DOCCRAFT_2026-09-25.md`
+
+Runtime ปัจจุบัน:
+- Worker `wstera-dc01` (static assets, ไม่มี Worker script บน HTTPS) — custom domains: `doccraft.wstera.com` (canonical) + `dc01.wstera.com` (legacy compatibility)
+- Worker `wstera-dc01-http-redirect` — routes `http://doccraft.wstera.com/*` + `http://dc01.wstera.com/*`; upgrade เป็น HTTPS บน host เดิม (ไม่ redirect ข้าม host)
+- HTTP ที่ live จริงตอนนี้ตอบ `301` จาก zone edge ก่อนถึง Worker route — gap `301`/`308` เป็น finding แยก ยังไม่ปิด
+
+Legacy `dc01.wstera.com`:
+- เสิร์ฟ app ตัวเดียวกันต่อ (dual-serve) จนกว่าจะมี disposition/sunset ที่ Owner อนุมัติ
+- **ห้าม redirect `dc01` → `doccraft` แบบ blind:** draft อยู่ใน `localStorage` ของแต่ละ origin ผู้ใช้เดิมจะไม่เห็น draft บน host ใหม่ ต้องมีแผนย้ายข้อมูล (JSON backup export/import) + แจ้งผู้ใช้ก่อน
+- ห้ามถอด custom domain `dc01.wstera.com` จนกว่าจะปิด migration อย่างเป็นทางการ
+
+Production smoke:
+- canonical: `pnpm smoke:prod` (default `https://doccraft.wstera.com`)
+- legacy: `DC01_URL=https://dc01.wstera.com pnpm smoke:prod`
+- `DC01_SMOKE_SKIP_HTTP_TRANSPORT=1` ข้ามเฉพาะ assert HTTP→`308` แบบประกาศชัด (พิมพ์ `TRANSPORT_ASSERT_SKIPPED observed=<status>` และผลเป็น `PRODUCTION_SMOKE_APP_PASS_TRANSPORT_SKIPPED` ไม่ใช่ `PRODUCTION_SMOKE_PASS`)
+- adversarial probes รับ `DC01_URL` เหมือนกัน (default canonical)
+
+Rollback (ไม่เสีย branch-toggle/security fix):
+- main: `wrangler rollback e84767c8-955f-4562-a159-80fdee44722f --name wstera-dc01` — version ก่อน migration (asset ชุดเดียวกัน แต่ custom domain เป็น trigger แยกจาก version: ถ้าจะถอด `doccraft.wstera.com` ต้อง deploy config ที่ไม่มี route นั้น)
+- redirect: `wrangler rollback 8d271814-327b-48b7-9ba6-3b314f9b6aa0 --name wstera-dc01-http-redirect` + ถอด route `http://doccraft.wstera.com/*` ถ้าต้องการ

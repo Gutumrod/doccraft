@@ -1,7 +1,8 @@
 # DocCraft — Public Pilot Evidence Log
 
 > **Opened:** 2026-09-08
-> **Production:** `https://dc01.wstera.com`
+> **Production:** `https://dc01.wstera.com` (at opening)
+> **Canonical from 2026-09-25:** `https://doccraft.wstera.com` — record which host each participant used
 > **Collection mode:** No telemetry / manual evidence
 > **Privacy rule:** repository contains pseudonymous participant IDs only; no customer-document content or unnecessary PII
 > **Current real-user evidence:** NONE YET

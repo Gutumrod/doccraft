@@ -1,6 +1,9 @@
 import { chromium } from '@playwright/test';
 
-const target = process.env.DC01_URL || 'https://dc01.wstera.com';
+// Canonical host by default; set DC01_URL=https://dc01.wstera.com for the legacy compatibility check.
+const target = process.env.DC01_URL || 'https://doccraft.wstera.com';
+// Explicit opt-out for the separately tracked 301-vs-308 edge finding; never silently accepts 301.
+const skipTransport = process.env.DC01_SMOKE_SKIP_HTTP_TRANSPORT === '1';
 const targetUrl = new URL(target);
 const canonicalHost = targetUrl.host;
 const browsers = [
@@ -24,10 +27,14 @@ function assertSecurityHeaders(headers, label) {
 const httpTarget = new URL(target);
 httpTarget.protocol = 'http:';
 const redirectResponse = await fetch(httpTarget, { redirect: 'manual' });
-if (redirectResponse.status !== 308) throw new Error(`transport: expected HTTP 308, got ${redirectResponse.status}`);
 const redirectLocation = redirectResponse.headers.get('location');
-if (!redirectLocation || new URL(redirectLocation).protocol !== 'https:' || new URL(redirectLocation).host !== canonicalHost) {
-  throw new Error(`transport: invalid HTTPS redirect target: ${redirectLocation || 'missing'}`);
+if (skipTransport) {
+  console.log(`TRANSPORT_ASSERT_SKIPPED observed=${redirectResponse.status} location=${redirectLocation || 'missing'}`);
+} else {
+  if (redirectResponse.status !== 308) throw new Error(`transport: expected HTTP 308, got ${redirectResponse.status}`);
+  if (!redirectLocation || new URL(redirectLocation).protocol !== 'https:' || new URL(redirectLocation).host !== canonicalHost) {
+    throw new Error(`transport: invalid HTTPS redirect target: ${redirectLocation || 'missing'}`);
+  }
 }
 
 for (const [label, channel] of browsers) {
@@ -91,4 +98,4 @@ for (const [label, channel] of browsers) {
   await browser.close();
 }
 
-console.log(`PRODUCTION_SMOKE_PASS ${target}`);
+console.log(skipTransport ? `PRODUCTION_SMOKE_APP_PASS_TRANSPORT_SKIPPED ${target}` : `PRODUCTION_SMOKE_PASS ${target}`);

@@ -6,6 +6,10 @@
   "preview_urls": false,
   "routes": [
     {
+      "pattern": "http://doccraft.wstera.com/*",
+      "zone_name": "wstera.com"
+    },
+    {
       "pattern": "http://dc01.wstera.com/*",
       "zone_name": "wstera.com"
     }

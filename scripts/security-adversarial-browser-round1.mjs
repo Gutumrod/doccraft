@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 
-const TARGET = 'https://dc01.wstera.com';
+const TARGET = process.env.DC01_URL || 'https://doccraft.wstera.com';
 const STORAGE_KEY = 'doccraft_current_draft_v1';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });

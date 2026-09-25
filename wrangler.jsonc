@@ -8,6 +8,11 @@
   },
   "routes": [
     {
+      "pattern": "doccraft.wstera.com",
+      "custom_domain": true
+    },
+    // Legacy code host: kept serving the same app until an explicit sunset/redirect decision.
+    {
       "pattern": "dc01.wstera.com",
       "custom_domain": true
     }

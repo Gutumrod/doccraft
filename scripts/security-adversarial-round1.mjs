@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
-const BASE = 'https://dc01.wstera.com';
-const HTTP = 'http://dc01.wstera.com';
+const BASE = process.env.DC01_URL || 'https://doccraft.wstera.com';
+const HTTP = BASE.replace(/^https:/, 'http:');
 
 async function probe(label, url, init = {}) {
   try {
@@ -80,7 +80,7 @@ const findings = [];
 const byLabel = new Map(results.filter(Boolean).map((r) => [r.label, r]));
 for (const label of ['http-root', 'http-static', 'http-path-query', 'http-xfh-poison']) {
   const r = byLabel.get(label);
-  if (!r || r.status !== 308 || !r.location?.startsWith('https://dc01.wstera.com/')) {
+  if (!r || r.status !== 308 || !r.location?.startsWith(`${BASE}/`)) {
     findings.push(`HIGH transport redirect failure: ${label}`);
   }
   if (r?.location?.includes('evil.example')) findings.push(`HIGH host-header redirect poisoning: ${label}`);

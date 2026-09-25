@@ -1,6 +1,7 @@
 # DocCraft — Public Pilot Participant Brief
 
-> **Production:** `https://dc01.wstera.com`
+> **Production:** `https://doccraft.wstera.com` (since 2026-09-25)
+> **Legacy address:** `https://dc01.wstera.com` still works; drafts saved there stay on that address — use JSON backup export/import to move them
 > **Pilot type:** Free controlled Public Pilot
 
 ## สิ่งที่อยากให้ลอง

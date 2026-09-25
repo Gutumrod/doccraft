@@ -5,19 +5,20 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const redirected = await httpRedirectWorker.fetch(
-  new Request('http://dc01.wstera.com/path?q=1&x=2'),
-);
-assert(redirected.status === 308, `expected 308, got ${redirected.status}`);
-assert(
-  redirected.headers.get('location') === 'https://dc01.wstera.com/path?q=1&x=2',
-  'HTTPS redirect did not preserve canonical host/path/query',
-);
+// Canonical host first, then the legacy compatibility host.
+for (const host of ['doccraft.wstera.com', 'dc01.wstera.com']) {
+  const redirected = await httpRedirectWorker.fetch(
+    new Request(`http://${host}/path?q=1&x=2`),
+  );
+  assert(redirected.status === 308, `${host}: expected 308, got ${redirected.status}`);
+  assert(
+    redirected.headers.get('location') === `https://${host}/path?q=1&x=2`,
+    `${host}: HTTPS redirect did not preserve host/path/query`,
+  );
 
-const httpsBypass = await httpRedirectWorker.fetch(
-  new Request('https://dc01.wstera.com/'),
-);
-assert(httpsBypass.status === 404, 'redirect Worker must not serve HTTPS content');
+  const httpsBypass = await httpRedirectWorker.fetch(new Request(`https://${host}/`));
+  assert(httpsBypass.status === 404, `${host}: redirect Worker must not serve HTTPS content`);
+}
 
 const wrongHost = await httpRedirectWorker.fetch(
   new Request('http://example.com/'),

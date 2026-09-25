@@ -1,3 +1,21 @@
+# Current-State Overlay — 2026-09-25 (Public Hostname Migration)
+
+**Canonical production:** `https://doccraft.wstera.com`
+**Legacy compatibility host:** `https://dc01.wstera.com` — still serves the same app (no cross-host redirect)
+**Product code:** `DC01` (internal identifier, unchanged)
+**Policy:** parent `Gutumrod/saas-product-hub@8873bbc8e62fe578a5ba75d0083a9e44d800dfbb` `docs/platform/PRODUCT_PUBLIC_NAMING_AND_HOSTNAME_POLICY.md`
+**Evidence:** `docs/HOSTNAME_MIGRATION_DOCCRAFT_2026-09-25.md`
+
+- Worker `wstera-dc01` version `2f204f27-2d9a-4b79-b9d8-02ed1c00e00a` serves both custom domains `doccraft.wstera.com` and `dc01.wstera.com`.
+- Worker `wstera-dc01-http-redirect` version `b899965e-d3d8-4cbb-801c-cbca9d6a777a` holds routes `http://doccraft.wstera.com/*` and `http://dc01.wstera.com/*`.
+- Live HTTP on both hosts currently returns `301` to the same host/path/query over HTTPS (zone edge answers before the Worker route). The `301` vs `308` contract gap is a separate open finding (`docs/testing/DEFECT_BRANCH_SELECTION_TOGGLE_2026-09-24.md`), not changed by this migration.
+- Drafts are browser-local per origin: a draft saved on `dc01.wstera.com` is not visible on `doccraft.wstera.com`. Users move drafts via JSON backup export/import.
+- Application source is the branch-toggle fix state (`f5f4951`) plus hostname config; Phase 7 remains frozen.
+
+The 2026-09-08 status below is preserved as dated history; where it conflicts with this overlay, this overlay wins.
+
+---
+
 # Current Status - 2026-09-08
 
 **Product:** DocCraft (DC01)
