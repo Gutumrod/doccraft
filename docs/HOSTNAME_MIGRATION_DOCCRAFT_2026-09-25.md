@@ -107,3 +107,9 @@ External dependency / callback:
 
 - main: `pnpm dlx wrangler@4.129.0 rollback e84767c8-955f-4562-a159-80fdee44722f --name wstera-dc01` (asset/security ชุดเดียวกับ production ก่อน migration) — custom domain ไม่ได้ผูกกับ version ถ้าจะถอด `doccraft.wstera.com` ต้อง deploy config ที่ไม่มี route นั้น
 - redirect: `pnpm dlx wrangler@4.129.0 rollback 8d271814-327b-48b7-9ba6-3b314f9b6aa0 --name wstera-dc01-http-redirect` + ถอด route `http://doccraft.wstera.com/*`
+
+## 11. Source ↔ runtime equivalence
+
+- code/config ที่ deploy (`wrangler*.jsonc`, `worker/`, `scripts/`, `src/`) แก้ครั้งสุดท้ายก่อน deploy (≤ 2026-09-25T01:13:08Z เทียบกับ deploy 01:16:12Z / 01:17:29Z) และไม่ได้แตะอีกหลังจากนั้น — หลัง deploy เพิ่มแค่ docs
+- rebuild จาก commit `8c0ffd6`: chunk JS/CSS 8/8 ตรงกับ live ทั้ง 2 host แบบ byte-identical, `index.html` ตรงกันเมื่อ normalize Next build id แล้ว (`0d6c5fc5931ba686…` ทั้ง live และ rebuild)
+- Next build id สุ่มใหม่ทุกครั้งที่ build และถูกฝังอยู่ใน inline script จึงทำให้ CSP inline hash 2 ใน 3 ตัวต่างกันระหว่าง build — ไม่ใช่ source drift แต่หมายความว่า rebuild ไม่ bit-identical กับ artifact ที่ deploy ไปแล้ว (เป็นคุณสมบัติเดิม ไม่ได้เกิดจาก migration นี้)
