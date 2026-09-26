@@ -26,3 +26,17 @@
   changed by this decision.
 - **Status:** ACTIVE — future work to surface JSON backup must re-enter scope review per
   `ONBOARDING_AND_SUPPORT.md` §6 before the controls are re-exposed.
+
+## D-2026-09-16 — Expand DocCraft toward a Business Document Launcher
+
+- **Date:** 2026-09-16
+- **Owner instruction:** คุณฟรี (product owner).
+- **Decision:** DocCraft will continue beyond the current five transactional V1 document types toward a **Business Document Launcher / Structured Business Document Studio** for common office and SME documents.
+- **Target UX:** `Open DocCraft → choose document → fill structured fields → preview → print / Save as PDF through the browser`.
+- **Product boundary:** DocCraft must remain structured-document-first and **must not become a Word clone or blank-page free-form editor as its primary experience**.
+- **Expansion direction:** document families may include Sales & Billing, Operations, Purchasing, Office, and HR/Internal Administration. Candidate types include Purchase Order, Delivery Note, Service Report, Purchase Request, Goods Receipt, Memo, Business Letter, Meeting Agenda/Minutes, Leave Request, OT Request, Employee Certificate, expense/reimbursement forms, and asset borrow/return forms.
+- **Architecture direction:** future expansion should generalize a document-definition/schema layer and shared reusable blocks instead of implementing unrelated hard-coded editors per template.
+- **International direction:** preserve a common DocCraft core and isolate country-specific terminology, tax/payment/legal fields and document conventions into locale/country packs where practical.
+- **V1 protection:** this decision does **not** change the current V1 PRD, current five supported document types, PV gate, or existing roadmap gates. Promotion into implementation scope requires an explicit PRD/roadmap extension with acceptance criteria.
+- **Canonical direction document:** `docs/PRODUCT_DIRECTION_BUSINESS_DOCUMENT_LAUNCHER.md`.
+- **Status:** ACTIVE — approved post-V1 product direction.
