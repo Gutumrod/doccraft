@@ -10,7 +10,7 @@ const httpRedirectWorker = {
     }
     url.protocol = 'https:';
     return new Response(null, {
-      status: 308,
+      status: 301,
       headers: { Location: url.toString(), 'Cache-Control': 'no-store' },
     });
   },

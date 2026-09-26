@@ -95,9 +95,13 @@ External dependency / callback:
 - `301` มาจาก zone edge ก่อนถึง Worker route (น่าจะเป็น Always Use HTTPS — ยืนยันผ่าน API ไม่ได้เพราะ token ขาดสิทธิ์) redirect worker ที่ deploy แล้วจึงเป็น fallback เท่านั้น
 - migration นี้ไม่ได้แตะ zone setting และไม่ได้ปรับ assertion เพื่อให้ผ่าน — ยังเป็น open finding ตาม `docs/testing/DEFECT_BRANCH_SELECTION_TOGGLE_2026-09-24.md`
 
+### 8.1 Owner transport decision — 2026-09-25
+
+Owner locked the existing `301` behavior on 2026-09-25: accept HTTP `301` or `308` only when it redirects to HTTPS on the same host and preserves the requested path and query. The earlier `301`/`308` finding is closed by aligning the automated contract; this decision does not authorize cross-host redirects, hostname sunset, or zone/DNS changes. See `REPORT-S10-DC01-ACCEPT-301.md` for implementation and verification evidence.
+
 ## 9. Known limitations / open decisions
 
-1. `301` vs `308`: Owner ต้องตัดสินใจเอง (แก้ zone หรือปรับ contract) — ไม่ได้แก้ในงานนี้
+1. `301` vs `308`: **closed by Owner decision on 2026-09-25**; retain `301` behavior and accept either `301` or `308` under the same-host HTTPS + path/query-preservation contract.
 2. Legacy disposition: `dc01` ยัง dual-serve อยู่ ถ้าจะ redirect/sunset ต้องมีแผนย้าย draft (JSON export/import) + ประกาศผู้ใช้ Pilot ก่อน
 3. ยังไม่มีการเปลี่ยน catalog/Hub ภายนอกให้ลิงก์ไป canonical (ตอนนี้ hub-web ไม่มีลิงก์ไปทั้ง 2 hostname)
 4. Parent registry `runtime_project`/description ยังเขียนว่า "canonical target pending migration" — ต้องอัปเดตใน parent repo แยกต่างหาก

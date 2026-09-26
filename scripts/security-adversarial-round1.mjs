@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { getHttpRedirectContractError } from './http-redirect-contract.mjs';
 
 const BASE = process.env.DC01_URL || 'https://doccraft.wstera.com';
 const HTTP = BASE.replace(/^https:/, 'http:');
@@ -80,8 +81,16 @@ const findings = [];
 const byLabel = new Map(results.filter(Boolean).map((r) => [r.label, r]));
 for (const label of ['http-root', 'http-static', 'http-path-query', 'http-xfh-poison']) {
   const r = byLabel.get(label);
-  if (!r || r.status !== 308 || !r.location?.startsWith(`${BASE}/`)) {
-    findings.push(`HIGH transport redirect failure: ${label}`);
+  const requestPaths = {
+    'http-root': '/',
+    'http-static': '/_next/static/chunks/10qtd36fop5p8.js',
+    'http-path-query': '/a/b?x=1&y=2',
+    'http-xfh-poison': '/poison?x=1',
+  };
+  const expectedHttpUrl = new URL(requestPaths[label], HTTP);
+  const transportError = r && getHttpRedirectContractError(r.status, r.location, expectedHttpUrl);
+  if (!r || transportError) {
+    findings.push(`HIGH transport redirect failure: ${label}${transportError ? ` (${transportError})` : ''}`);
   }
   if (r?.location?.includes('evil.example')) findings.push(`HIGH host-header redirect poisoning: ${label}`);
 }

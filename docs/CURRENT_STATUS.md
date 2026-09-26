@@ -110,3 +110,7 @@ Phase 7 / Supabase / Auth / Cloud sync, Phase 8 billing, and Phase 9 post-MVP ca
 ## Change Rule
 
 Update this file when branch/gate/runtime reality changes. Do not rewrite historical evidence to make an old result look current.
+
+## HTTP Transport Contract Amendment — 2026-09-25
+
+Owner locked the existing production HTTP `301` behavior on 2026-09-25. Current acceptance permits `301` or `308` only for HTTPS on the same host with the original path and query preserved; the prior 301/308 finding is closed by matching automated assertions to this contract. Production smoke must run the transport assertion with no skip. This does not change hostname routing or authorize cross-host redirects or sunset. See `HOSTNAME_MIGRATION_DOCCRAFT_2026-09-25.md` §8.1 and `RELEASE_AND_OPERATIONS_RUNBOOK.md` §11 for the contract; the S10 report records verification evidence.

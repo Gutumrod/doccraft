@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import httpRedirectWorker from '../worker/http-redirect.mjs';
+import { getHttpRedirectContractError } from './http-redirect-contract.mjs';
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -10,10 +11,14 @@ for (const host of ['doccraft.wstera.com', 'dc01.wstera.com']) {
   const redirected = await httpRedirectWorker.fetch(
     new Request(`http://${host}/path?q=1&x=2`),
   );
-  assert(redirected.status === 308, `${host}: expected 308, got ${redirected.status}`);
+  assert(redirected.status === 301, `${host}: expected 301, got ${redirected.status}`);
   assert(
     redirected.headers.get('location') === `https://${host}/path?q=1&x=2`,
     `${host}: HTTPS redirect did not preserve host/path/query`,
+  );
+  assert(
+    getHttpRedirectContractError(redirected.status, redirected.headers.get('location'), `http://${host}/path?q=1&x=2`) === null,
+    `${host}: redirect does not satisfy the transport contract`,
   );
 
   const httpsBypass = await httpRedirectWorker.fetch(new Request(`https://${host}/`));
