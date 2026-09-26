@@ -15,9 +15,9 @@
     "test:e2e": "pnpm build && playwright test",
     "test:security-boundary": "node scripts/security-boundary-selftest.mjs",
     "smoke:prod": "node scripts/phase6-production-smoke.mjs",
-    "deploy:http-redirect": "pnpm dlx wrangler@4.129.0 deploy -c wrangler.http-redirect.jsonc",
-    "deploy:main": "pnpm dlx wrangler@4.129.0 deploy -c wrangler.jsonc",
-    "deploy": "pnpm build && pnpm run deploy:http-redirect && pnpm run deploy:main"
+    "deploy:http-redirect": "node scripts/wstera-billing-guard.mjs && pnpm dlx wrangler@4.129.0 deploy -c wrangler.http-redirect.jsonc",
+    "deploy:main": "node scripts/wstera-billing-guard.mjs && pnpm dlx wrangler@4.129.0 deploy -c wrangler.jsonc",
+    "deploy": "node scripts/wstera-billing-guard.mjs && pnpm build && pnpm run deploy:http-redirect && pnpm run deploy:main"
   },
   "dependencies": {
     "next": "16.3.3",

@@ -141,3 +141,16 @@ Owner locked the existing production HTTP `301` behavior on 2026-09-25. Producti
 Rollback (ไม่เสีย branch-toggle/security fix):
 - main: `wrangler rollback e84767c8-955f-4562-a159-80fdee44722f --name wstera-dc01` — version ก่อน migration (asset ชุดเดียวกัน แต่ custom domain เป็น trigger แยกจาก version: ถ้าจะถอด `doccraft.wstera.com` ต้อง deploy config ที่ไม่มี route นั้น)
 - redirect: `wrangler rollback 8d271814-327b-48b7-9ba6-3b314f9b6aa0 --name wstera-dc01-http-redirect` + ถอด route `http://doccraft.wstera.com/*` ถ้าต้องการ
+
+## 12. WSTERA Billing Boundary Pre-Deploy Guard — 2026-09-26
+
+ทุก production deploy script (`deploy`, `deploy:main`, `deploy:http-redirect`) เรียก
+`node scripts/wstera-billing-guard.mjs` ก่อน build/deploy หรือก่อนเรียก Wrangler
+wrapper เรียก guard ก่อนเริ่ม build และ leaf scripts เรียกซ้ำก่อน deploy Worker แต่ละตัว
+
+guard ที่เรียกคือ `<vault>/06-Agent-Logs/WSTERA-House/tools/verify_wstera_billing_boundary.py`.
+กำหนด `WSTERA_VAULT` เป็น root ของ vault หากไม่ได้ใช้ path มาตรฐาน; ถ้าไม่กำหนดจะลอง
+`D:\AI-Workspace\vault` บน Windows หรือ `~/AI-Workspace/vault` บน macOS
+ต้องมี Python 3 และ PyYAML ตามข้อกำหนดของ guard. หากไม่พบ guard, เรียก Python ไม่สำเร็จ,
+หรือผลไม่ใช่ `WSTERA_BILLING_BOUNDARY_PASS` คำสั่ง deploy จะหยุดแบบ fail-closed.
+ไม่มี flag ข้าม guard. Script wrapper พิมพ์เฉพาะ PASS/FAIL กับ path และไม่แสดงเนื้อหาไฟล์ที่ guard สแกน.
