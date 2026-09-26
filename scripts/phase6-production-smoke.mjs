@@ -1,9 +1,11 @@
 import { chromium } from '@playwright/test';
+import { getHttpRedirectContractError } from './http-redirect-contract.mjs';
 
 // Canonical host by default; set DC01_URL=https://dc01.wstera.com for the legacy compatibility check.
 const target = process.env.DC01_URL || 'https://doccraft.wstera.com';
-// Explicit opt-out for the separately tracked 301-vs-308 edge finding; never silently accepts 301.
-const skipTransport = process.env.DC01_SMOKE_SKIP_HTTP_TRANSPORT === '1';
+if (process.env.DC01_SMOKE_SKIP_HTTP_TRANSPORT === '1') {
+  throw new Error('DC01_SMOKE_SKIP_HTTP_TRANSPORT is deprecated and unsupported; production smoke must verify HTTP transport.');
+}
 const targetUrl = new URL(target);
 const canonicalHost = targetUrl.host;
 const browsers = [
@@ -24,18 +26,13 @@ function assertSecurityHeaders(headers, label) {
   if (!(headers['x-robots-tag'] || '').includes('noindex')) throw new Error(`${label}: X-Robots-Tag noindex missing`);
 }
 
-const httpTarget = new URL(target);
+const httpTarget = new URL('/a/b?x=1&y=2', target);
 httpTarget.protocol = 'http:';
 const redirectResponse = await fetch(httpTarget, { redirect: 'manual' });
 const redirectLocation = redirectResponse.headers.get('location');
-if (skipTransport) {
-  console.log(`TRANSPORT_ASSERT_SKIPPED observed=${redirectResponse.status} location=${redirectLocation || 'missing'}`);
-} else {
-  if (redirectResponse.status !== 308) throw new Error(`transport: expected HTTP 308, got ${redirectResponse.status}`);
-  if (!redirectLocation || new URL(redirectLocation).protocol !== 'https:' || new URL(redirectLocation).host !== canonicalHost) {
-    throw new Error(`transport: invalid HTTPS redirect target: ${redirectLocation || 'missing'}`);
-  }
-}
+const transportError = getHttpRedirectContractError(redirectResponse.status, redirectLocation, httpTarget);
+if (transportError) throw new Error(`transport: ${transportError}`);
+console.log(`TRANSPORT_PASS status=${redirectResponse.status} location=${redirectLocation}`);
 
 for (const [label, channel] of browsers) {
   const browser = await chromium.launch({ channel, headless: true });
@@ -98,4 +95,4 @@ for (const [label, channel] of browsers) {
   await browser.close();
 }
 
-console.log(skipTransport ? `PRODUCTION_SMOKE_APP_PASS_TRANSPORT_SKIPPED ${target}` : `PRODUCTION_SMOKE_PASS ${target}`);
+console.log(`PRODUCTION_SMOKE_PASS ${target}`);

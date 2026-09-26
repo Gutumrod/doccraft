@@ -134,6 +134,10 @@ Production smoke:
 - `DC01_SMOKE_SKIP_HTTP_TRANSPORT=1` ข้ามเฉพาะ assert HTTP→`308` แบบประกาศชัด (พิมพ์ `TRANSPORT_ASSERT_SKIPPED observed=<status>` และผลเป็น `PRODUCTION_SMOKE_APP_PASS_TRANSPORT_SKIPPED` ไม่ใช่ `PRODUCTION_SMOKE_PASS`)
 - adversarial probes รับ `DC01_URL` เหมือนกัน (default canonical)
 
+## 11. HTTP Transport Contract Amendment — 2026-09-25
+
+Owner locked the existing production HTTP `301` behavior on 2026-09-25. Production smoke and adversarial transport checks must accept `301` or `308` only when `Location` is HTTPS on the same host and preserves the requested path and query. No redirect, another host, an HTTP target, a changed path/query, or another status is a failure. Production smoke transport skipping via `DC01_SMOKE_SKIP_HTTP_TRANSPORT` is deprecated and unsupported. This amendment does not authorize cross-host redirects, legacy-host sunset, Cloudflare zone changes, or DNS changes. See `HOSTNAME_MIGRATION_DOCCRAFT_2026-09-25.md` §8.1 and the S10 report for evidence.
+
 Rollback (ไม่เสีย branch-toggle/security fix):
 - main: `wrangler rollback e84767c8-955f-4562-a159-80fdee44722f --name wstera-dc01` — version ก่อน migration (asset ชุดเดียวกัน แต่ custom domain เป็น trigger แยกจาก version: ถ้าจะถอด `doccraft.wstera.com` ต้อง deploy config ที่ไม่มี route นั้น)
 - redirect: `wrangler rollback 8d271814-327b-48b7-9ba6-3b314f9b6aa0 --name wstera-dc01-http-redirect` + ถอด route `http://doccraft.wstera.com/*` ถ้าต้องการ
