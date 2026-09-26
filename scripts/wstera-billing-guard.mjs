@@ -48,7 +48,7 @@ export function runBillingGuard({
 
   let result;
   try {
-    result = spawn("python", [guardPath], { encoding: "utf8", env });
+    result = spawn(platform === "win32" ? "python" : "python3", [guardPath], { encoding: "utf8", env });
   } catch {
     return { pass: false, path: guardPath, reason: "Could not start Python billing guard" };
   }
