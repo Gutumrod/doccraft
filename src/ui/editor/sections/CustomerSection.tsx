@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import type { CustomerProfile } from '../../../domain/document/types';
 
 interface CustomerSectionProps {
@@ -10,23 +11,25 @@ interface CustomerSectionProps {
 }
 
 export function CustomerSection({ customer, onUpdateCustomer, isVisible }: CustomerSectionProps) {
+  const t = useTranslations('customer');
+  const section = useTranslations('section');
   if (!isVisible) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-500 flex items-center justify-between">
-        <span>ข้อมูลลูกค้า (ซ่อนอยู่ - ข้อมูลยังคงอยู่ในระบบ)</span>
+        <span>{section('hidden', { section: section('customer') })}</span>
       </div>
     );
   }
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-      <h2 className="mb-4 text-base font-semibold text-slate-900">3. ข้อมูลลูกค้า / ผู้ว่าจ้าง (Customer Profile)</h2>
+      <h2 className="mb-4 text-base font-semibold text-slate-900">{t('heading')}</h2>
 
       {/* Customer Name & Tax ID */}
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="custDisplayName" className="mb-1 block text-xs font-medium text-slate-700">
-            ชื่อลูกค้า / บริษัทผู้ว่าจ้าง <span className="text-red-500">*</span>
+            {t('nameLabel')} <span className="text-red-500">*</span>
           </label>
           <input
             id="custDisplayName"
@@ -34,14 +37,14 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
             type="text"
             value={customer.displayName}
             onChange={(e) => onUpdateCustomer({ displayName: e.target.value })}
-            placeholder="บริษัท ลูกค้าใจดี จำกัด"
+            placeholder={t('namePlaceholder')}
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
           />
         </div>
 
         <div>
           <label htmlFor="custTaxId" className="mb-1 block text-xs font-medium text-slate-700">
-            เลขประจำตัวผู้เสียภาษี (13 หลัก)
+            {t('taxId')}
           </label>
           <input
             id="custTaxId"
@@ -59,7 +62,7 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
       {/* Address */}
       <div className="mb-4">
         <label htmlFor="custAddress" className="mb-1 block text-xs font-medium text-slate-700">
-          ที่อยู่ลูกค้า / สถานที่จัดส่ง <span className="text-red-500">*</span>
+          {t('addressLabel')} <span className="text-red-500">*</span>
         </label>
         <textarea
           id="custAddress"
@@ -67,7 +70,7 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
           rows={2}
           value={customer.address}
           onChange={(e) => onUpdateCustomer({ address: e.target.value })}
-          placeholder="เลขที่ อาคาร ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์"
+          placeholder={t('addressPlaceholder')}
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
         />
       </div>
@@ -76,7 +79,7 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-xs font-medium text-slate-700">
-            สาขาของลูกค้า
+            {t('branchName')}
           </label>
           <div className="flex gap-2">
             <button
@@ -95,7 +98,7 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              สำนักงานใหญ่
+              {t('headOffice')}
             </button>
             <button
               type="button"
@@ -113,7 +116,7 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              สาขา
+              {t('branch')}
             </button>
           </div>
         </div>
@@ -121,7 +124,7 @@ export function CustomerSection({ customer, onUpdateCustomer, isVisible }: Custo
         {customer.branchType === 'branch' && (
           <div>
             <label htmlFor="custBranchNumber" className="mb-1 block text-xs font-medium text-slate-700">
-              เลขที่สาขา
+              {t('branchNumber')}
             </label>
             <input
               id="custBranchNumber"

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import type { BlockVisibility } from '../../domain/document/types';
 
 interface BlockVisibilityControlsProps {
@@ -8,31 +9,32 @@ interface BlockVisibilityControlsProps {
   onChange: (block: keyof BlockVisibility, visible: boolean) => void;
 }
 
-const BLOCK_CONFIGS: { key: keyof BlockVisibility; label: string; description: string }[] = [
-  { key: 'business', label: 'ข้อมูลผู้ออกเอกสาร', description: 'ชื่อผู้ประกอบการ ที่อยู่ เลขประจำตัวผู้เสียภาษี' },
-  { key: 'businessLogo', label: 'โลโก้ธุรกิจ', description: 'แสดงโลโก้บริษัท/ร้านค้าที่หัวเอกสาร' },
-  { key: 'customer', label: 'ข้อมูลลูกค้า', description: 'ชื่อลูกค้า/บริษัท ที่อยู่จัดส่ง/วางบิล' },
-  { key: 'items', label: 'ตารางรายการสินค้า', description: 'รายการ จำนวน ราคา ส่วนลดรายบรรทัด' },
-  { key: 'itemImages', label: 'รูปภาพสินค้า', description: 'รูปภาพประกอบรายการสินค้า/งานบริการ' },
-  { key: 'adjustments', label: 'ภาษีและส่วนลด', description: 'ส่วนลดเอกสาร, VAT 7%, หัก ณ ที่จ่าย, มัดจำ' },
-  { key: 'payment', label: 'ข้อมูลการชำระเงิน', description: 'ช่องทางชำระเงิน บัญชีธนาคาร' },
-  { key: 'terms', label: 'เงื่อนไขและข้อตกลง', description: 'กำหนดยืนราคา ระยะเวลาส่งมอบ' },
-  { key: 'notes', label: 'หมายเหตุ', description: 'ข้อความเพิ่มเติมท้ายเอกสาร' },
-  { key: 'signatures', label: 'ช่องลงลายมือชื่อ', description: 'ลายมือชื่อผู้อนุมัติ/ผู้รับมอบงาน' },
+const BLOCK_CONFIGS: { key: keyof BlockVisibility }[] = [
+  { key: 'business' },
+  { key: 'businessLogo' },
+  { key: 'customer' },
+  { key: 'items' },
+  { key: 'itemImages' },
+  { key: 'adjustments' },
+  { key: 'payment' },
+  { key: 'terms' },
+  { key: 'notes' },
+  { key: 'signatures' },
 ];
 
 export function BlockVisibilityControls({ blocks, onChange }: BlockVisibilityControlsProps) {
+  const t = useTranslations('blockVisibility');
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">บล็อกและส่วนประกอบเอกสาร (Modular Blocks)</h3>
-          <p className="text-xs text-slate-500">เลือกเปิด/ซ่อนบล็อกตามประเภทเอกสาร (ข้อมูลจะไม่สูญหายเมื่อซ่อน)</p>
+          <h3 className="text-sm font-semibold text-slate-900">{t('heading')}</h3>
+          <p className="text-xs text-slate-500">{t('description')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-3">
-        {BLOCK_CONFIGS.map(({ key, label }) => {
+        {BLOCK_CONFIGS.map(({ key }) => {
           const isVisible = blocks[key];
           return (
             <button
@@ -46,7 +48,7 @@ export function BlockVisibilityControls({ blocks, onChange }: BlockVisibilityCon
                   : 'border-slate-200 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
               }`}
             >
-              <span className="truncate">{label}</span>
+              <span className="truncate">{t(key)}</span>
               <span
                 className={`ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] ${
                   isVisible ? 'bg-indigo-600 text-white' : 'bg-slate-300 text-slate-600'

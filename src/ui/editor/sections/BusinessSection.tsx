@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { BusinessLogo } from '../../../domain/document/types';
 import type { BusinessProfile } from '../../../domain/tax/types';
 import { processBusinessLogoFile } from '../../../image/business-logo';
@@ -23,13 +24,15 @@ export function BusinessSection({
   onUpdateLogo,
   isVisible,
 }: BusinessSectionProps) {
+  const t = useTranslations('business');
+  const section = useTranslations('section');
   const [processing, setProcessing] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
 
   if (!isVisible) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-500 flex items-center justify-between">
-        <span>ข้อมูลผู้ออกเอกสาร (ซ่อนอยู่ - ข้อมูลยังคงอยู่ในระบบ)</span>
+        <span>{section('hidden', { section: section('business') })}</span>
       </div>
     );
   }
@@ -46,7 +49,7 @@ export function BusinessSection({
       // encode; a failed replacement keeps the previously accepted logo.
       onUpdateLogo(processed);
     } catch (error) {
-      setLogoError(error instanceof Error ? error.message : 'ประมวลผลโลโก้ไม่สำเร็จ');
+      setLogoError(error instanceof Error ? error.message : t('logoFailed'));
     } finally {
       setProcessing(false);
     }
@@ -54,7 +57,7 @@ export function BusinessSection({
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-      <h2 className="mb-4 text-base font-semibold text-slate-900">2. ข้อมูลผู้ออกเอกสาร (Business Profile)</h2>
+      <h2 className="mb-4 text-base font-semibold text-slate-900">{t('heading')}</h2>
 
       {/* Business Logo */}
       {showLogo && (
@@ -63,7 +66,7 @@ export function BusinessSection({
             {logo ? (
               <img
                 src={logo.dataUrl}
-                alt="โลโก้ธุรกิจ"
+                alt={t('logoAlt')}
                 data-testid="business-logo-editor-preview"
                 className="h-16 w-16 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
               />
@@ -71,11 +74,11 @@ export function BusinessSection({
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-2xl text-slate-400">🏷️</div>
             )}
             <div className="min-w-0 flex-1">
-              <div className="font-medium text-slate-800">โลโก้ธุรกิจ (Business Logo)</div>
-              <div className="mt-0.5 text-[11px] text-slate-500">PNG / JPEG / WebP · แสดงมุมซ้ายบนของหัวเอกสาร · ระบบย่อและบีบอัดก่อนบันทึก</div>
+              <div className="font-medium text-slate-800">{t('logo')}</div>
+              <div className="mt-0.5 text-[11px] text-slate-500">{t('logoHint')}</div>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <label className={`inline-flex cursor-pointer items-center rounded-md border px-2.5 py-1.5 font-semibold transition-colors ${processing ? 'cursor-wait border-slate-200 bg-slate-100 text-slate-400' : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}>
-                  {processing ? 'กำลังประมวลผล…' : logo ? 'เปลี่ยนโลโก้' : 'อัปโหลดโลโก้'}
+                  {processing ? t('processing') : logo ? t('changeLogo') : t('uploadLogo')}
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
@@ -99,7 +102,7 @@ export function BusinessSection({
                     }}
                     className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 font-semibold text-rose-700 hover:bg-rose-100"
                   >
-                    ลบโลโก้
+                    {t('removeLogo')}
                   </button>
                 )}
               </div>
@@ -113,7 +116,7 @@ export function BusinessSection({
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">
-            ประเภทผู้ประกอบการ
+            {t('entityType')}
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -126,7 +129,7 @@ export function BusinessSection({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              บุคคลธรรมดา / ฟรีแลนซ์
+              {t('individual')}
             </button>
             <button
               type="button"
@@ -138,14 +141,14 @@ export function BusinessSection({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              นิติบุคคล (บริษัท / หจก.)
+              {t('juristic')}
             </button>
           </div>
         </div>
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">
-            สถานะภาษีมูลค่าเพิ่ม (VAT)
+            {t('vatStatus')}
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -158,7 +161,7 @@ export function BusinessSection({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              ไม่ได้จดทะเบียน VAT
+              {t('notRegistered')}
             </button>
             <button
               type="button"
@@ -170,7 +173,7 @@ export function BusinessSection({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              จดทะเบียน VAT (ภ.พ.20)
+              {t('registered')}
             </button>
           </div>
         </div>
@@ -180,7 +183,7 @@ export function BusinessSection({
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="bizDisplayName" className="mb-1 block text-xs font-medium text-slate-700">
-            ชื่อกิจการ / ชื่อร้านค้า / ชื่อผู้ประกอบการ <span className="text-red-500">*</span>
+            {t('nameLabel')} <span className="text-red-500">*</span>
           </label>
           <input
             id="bizDisplayName"
@@ -188,14 +191,14 @@ export function BusinessSection({
             type="text"
             value={business.displayName}
             onChange={(e) => onUpdateBusiness({ displayName: e.target.value })}
-            placeholder="บริษัท ตัวอย่าง คอร์ปอเรชั่น จำกัด"
+            placeholder={t('namePlaceholder')}
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
           />
         </div>
 
         <div>
           <label htmlFor="bizTaxId" className="mb-1 block text-xs font-medium text-slate-700">
-            เลขประจำตัวผู้เสียภาษี (13 หลัก)
+            {t('taxId')}
           </label>
           <input
             id="bizTaxId"
@@ -213,7 +216,7 @@ export function BusinessSection({
       {/* Address */}
       <div className="mb-4">
         <label htmlFor="bizAddress" className="mb-1 block text-xs font-medium text-slate-700">
-          ที่อยู่สถานประกอบการ <span className="text-red-500">*</span>
+          {t('addressLabel')} <span className="text-red-500">*</span>
         </label>
         <textarea
           id="bizAddress"
@@ -221,7 +224,7 @@ export function BusinessSection({
           rows={2}
           value={business.address}
           onChange={(e) => onUpdateBusiness({ address: e.target.value })}
-          placeholder="เลขที่ อาคาร ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์"
+          placeholder={t('addressPlaceholder')}
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
         />
       </div>
@@ -230,7 +233,7 @@ export function BusinessSection({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-xs font-medium text-slate-700">
-            สาขาของสถานประกอบการ
+            {t('branchName')}
           </label>
           <div className="flex gap-2">
             <button
@@ -249,7 +252,7 @@ export function BusinessSection({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              สำนักงานใหญ่
+              {t('headOffice')}
             </button>
             <button
               type="button"
@@ -267,7 +270,7 @@ export function BusinessSection({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
-              สาขา
+              {t('branch')}
             </button>
           </div>
         </div>
@@ -275,7 +278,7 @@ export function BusinessSection({
         {business.branchType === 'branch' && (
           <div>
             <label htmlFor="bizBranchNumber" className="mb-1 block text-xs font-medium text-slate-700">
-              เลขที่สาขา (เช่น 00001) <span className="text-red-500">*</span>
+              {t('branchNumber')} <span className="text-red-500">*</span>
             </label>
             <input
               id="bizBranchNumber"

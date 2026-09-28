@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import type { CalculatedLine } from '../../../domain/calculation/types';
 import { processItemImageFile } from '../../../image/item-image';
 import type { DiscountConfig, LineItem } from '../../../domain/document/types';
@@ -25,13 +26,17 @@ export function ItemsSection({
   isVisible,
   showItemImages,
 }: ItemsSectionProps) {
+  const t = useTranslations('items');
+  const section = useTranslations('section');
+  const locale = useLocale();
+  const money = (value: number) => new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-US', { style: 'currency', currency: 'THB' }).format(value);
   const [processingItemId, setProcessingItemId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, string>>({});
 
   if (!isVisible) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-500 flex items-center justify-between">
-        <span>ตารางรายการสินค้า/บริการ (ซ่อนอยู่ - ข้อมูลยังคงอยู่ในระบบ)</span>
+        <span>{section('hidden', { section: section('items') })}</span>
       </div>
     );
   }
@@ -55,7 +60,7 @@ export function ItemsSection({
       const image = await processItemImageFile(file);
       onUpdateItem(itemId, { image });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'ประมวลผลรูปภาพไม่สำเร็จ';
+      const message = error instanceof Error ? error.message : t('imageFailed');
       setImageErrors((current) => ({ ...current, [itemId]: message }));
     } finally {
       setProcessingItemId((current) => (current === itemId ? null : current));
@@ -66,8 +71,8 @@ export function ItemsSection({
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-slate-900">4. รายการสินค้าและบริการ (Line Items)</h2>
-          <p className="text-xs text-slate-500">ระบุรายการ จำนวน ราคาต่อหน่วย และส่วนลดรายบรรทัด</p>
+          <h2 className="text-base font-semibold text-slate-900">{t('heading')}</h2>
+          <p className="text-xs text-slate-500">{t('hint')}</p>
         </div>
         <button
           type="button"
@@ -75,7 +80,7 @@ export function ItemsSection({
           onClick={onAddItem}
           className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 transition-all active:scale-95"
         >
-          <span>＋</span> เพิ่มรายการ
+          <span>＋</span> {t('add')}
         </button>
       </div>
 
@@ -98,7 +103,7 @@ export function ItemsSection({
                 <div className="flex items-center gap-3">
                   {calcLine && (
                     <span className="text-xs font-semibold text-slate-600">
-                      รวมบรรทัดนี้: <span className="font-mono text-indigo-700">{calcLine.totalAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</span> บาท
+                      {t('lineTotal')} <span className="font-mono text-indigo-700">{money(calcLine.totalAmount)}</span> {t('baht')}
                     </span>
                   )}
 
@@ -107,14 +112,14 @@ export function ItemsSection({
                     data-testid={`btn-remove-item-${item.id}`}
                     disabled={isOnlyItem}
                     onClick={() => onRemoveItem(item.id)}
-                    title={isOnlyItem ? 'เอกสารต้องมีอย่างน้อย 1 รายการ' : 'ลบรายการนี้'}
+                    title={isOnlyItem ? t('minimumItem') : t('remove')}
                     className={`rounded-md p-1 text-xs transition-colors ${
                       isOnlyItem
                         ? 'cursor-not-allowed text-slate-300'
                         : 'text-rose-500 hover:bg-rose-50 hover:text-rose-700'
                     }`}
                   >
-                    🗑️ ลบ
+                    🗑️ {t('remove')}
                   </button>
                 </div>
               </div>
@@ -125,7 +130,7 @@ export function ItemsSection({
                     {item.image ? (
                       <img
                         src={item.image.dataUrl}
-                        alt={`รูปประกอบ ${item.description || `รายการ ${index + 1}`}`}
+                        alt={t('imageAlt', { item: item.description || `Item ${index + 1}` })}
                         data-testid={`item-image-editor-${item.id}`}
                         className="h-20 w-20 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
                       />
@@ -133,11 +138,11 @@ export function ItemsSection({
                       <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-2xl text-slate-400">🖼️</div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium text-slate-800">รูปภาพประกอบรายการ</div>
-                      <div className="mt-0.5 text-[11px] text-slate-500">JPEG / PNG / WebP · ระบบจะย่อและบีบอัดก่อนบันทึก</div>
+                      <div className="font-medium text-slate-800">{t('imageTitle')}</div>
+                      <div className="mt-0.5 text-[11px] text-slate-500">{t('imageHint')}</div>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <label className={`inline-flex cursor-pointer items-center rounded-md border px-2.5 py-1.5 font-semibold transition-colors ${processingItemId === item.id ? 'cursor-wait border-slate-200 bg-slate-100 text-slate-400' : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}>
-                          {processingItemId === item.id ? 'กำลังประมวลผล…' : item.image ? 'เปลี่ยนรูป' : 'แนบรูป'}
+                          {processingItemId === item.id ? t('processing') : item.image ? t('changeImage') : t('attachImage')}
                           <input
                             type="file"
                             accept="image/jpeg,image/png,image/webp"
@@ -153,7 +158,7 @@ export function ItemsSection({
                         </label>
                         {item.image && (
                           <button type="button" data-testid={`btn-remove-item-image-${item.id}`} onClick={() => { onUpdateItem(item.id, { image: undefined }); clearImageError(item.id); }} className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 font-semibold text-rose-700 hover:bg-rose-100">
-                            ลบรูป
+                            {t('removeImage')}
                           </button>
                         )}
                       </div>
@@ -166,14 +171,14 @@ export function ItemsSection({
               {/* Description Input */}
               <div className="mb-3">
                 <label className="mb-1 block text-xs font-medium text-slate-700">
-                  รายละเอียดสินค้า / บริการ <span className="text-red-500">*</span>
+                  {t('description')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   data-testid={`input-item-desc-${item.id}`}
                   value={item.description}
                   onChange={(e) => onUpdateItem(item.id, { description: e.target.value })}
-                  placeholder="เช่น ค่าบริการออกแบบเว็บไซต์, เสื้อยืดพิมพ์ลาย Size L"
+                  placeholder={t('descriptionPlaceholder')}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
@@ -182,7 +187,7 @@ export function ItemsSection({
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-700">
-                    จำนวน <span className="text-red-500">*</span>
+                    {t('quantity')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -201,7 +206,7 @@ export function ItemsSection({
 
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-700">
-                    ราคาต่อหน่วย (บาท) <span className="text-red-500">*</span>
+                    {t('unitPrice')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -220,7 +225,7 @@ export function ItemsSection({
 
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-700">
-                    ส่วนลดรายบรรทัด
+                    {t('lineDiscount')}
                   </label>
                   <div className="flex gap-1.5">
                     <select
@@ -237,9 +242,9 @@ export function ItemsSection({
                       }}
                       className="rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs text-slate-700 focus:border-indigo-500 focus:outline-none"
                     >
-                      <option value="none">ไม่มี</option>
+                      <option value="none">{t('discountNone')}</option>
                       <option value="percent">%</option>
-                      <option value="fixed">บาท</option>
+                      <option value="fixed">{t('baht')}</option>
                     </select>
 
                     {item.discount.mode !== 'none' && (

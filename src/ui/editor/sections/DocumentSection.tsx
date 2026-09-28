@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { DOCUMENT_TYPES, type DocumentType, type DocCraftDocument } from '../../../domain/document/types';
 import { checkTaxInvoiceEligibility } from '../editor-state';
 
@@ -10,25 +11,19 @@ interface DocumentSectionProps {
   onUpdateHeader: (patch: Partial<Pick<DocCraftDocument, 'documentNumber' | 'issueDate' | 'dueDate'>>) => void;
 }
 
-const DOCUMENT_TYPE_LABELS: Record<DocumentType, { th: string; en: string }> = {
-  quotation: { th: 'ใบเสนอราคา', en: 'Quotation' },
-  invoice: { th: 'ใบแจ้งหนี้', en: 'Invoice' },
-  receipt: { th: 'ใบเสร็จรับเงิน', en: 'Receipt' },
-  work_order: { th: 'ใบสั่งงาน / ใบงาน', en: 'Work Order' },
-  tax_invoice: { th: 'ใบกำกับภาษี', en: 'Tax Invoice' },
-};
-
 export function DocumentSection({ document, onSelectDocumentType, onUpdateHeader }: DocumentSectionProps) {
+  const t = useTranslations('document');
+  const labels: Record<DocumentType, string> = { quotation: t('quotation'), invoice: t('invoice'), receipt: t('receipt'), work_order: t('workOrder'), tax_invoice: t('taxInvoice') };
   const taxEligibility = checkTaxInvoiceEligibility(document);
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-      <h2 className="mb-4 text-base font-semibold text-slate-900">1. ข้อมูลหัวเอกสาร (Document Header)</h2>
+      <h2 className="mb-4 text-base font-semibold text-slate-900">{t('header')}</h2>
 
       {/* Document Type Selector */}
       <div className="mb-5">
         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-600">
-          ประเภทเอกสาร
+          {t('type')}
         </label>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
           {DOCUMENT_TYPES.map((type) => {
@@ -54,15 +49,15 @@ export function DocumentSection({ document, onSelectDocumentType, onUpdateHeader
                       ? 'cursor-not-allowed border-slate-200 bg-slate-100/70 text-slate-400 opacity-60'
                       : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                 }`}
-                title={isLocked ? `ยังไม่สามารถออกใบกำกับภาษีได้:\n- ${taxEligibility.reasons.join('\n- ')}` : undefined}
+                title={isLocked ? `${t('taxNotEligible')}:\n- ${taxEligibility.reasons.join('\n- ')}` : undefined}
               >
                 {isLocked && (
-                  <span className="absolute top-1.5 right-1.5 text-[11px] text-amber-600" title="ต้องจด VAT">
+                  <span className="absolute top-1.5 right-1.5 text-[11px] text-amber-600" title={t('mustRegisterVat')}>
                     🔒
                   </span>
                 )}
-                <span className="text-xs font-bold">{DOCUMENT_TYPE_LABELS[type].th}</span>
-                <span className="text-[10px] text-slate-500">{DOCUMENT_TYPE_LABELS[type].en}</span>
+                <span className="text-xs font-bold">{labels[type]}</span>
+                <span className="text-[10px] text-slate-500">{type === 'work_order' ? 'Work Order' : type === 'tax_invoice' ? 'Tax Invoice' : type === 'quotation' ? 'Quotation' : type === 'invoice' ? 'Invoice' : 'Receipt'}</span>
               </button>
             );
           })}
@@ -72,8 +67,8 @@ export function DocumentSection({ document, onSelectDocumentType, onUpdateHeader
           <div className="mt-2 rounded-lg bg-amber-50/80 p-2.5 text-xs text-amber-800 border border-amber-200/60 flex items-start gap-2">
             <span className="text-sm leading-none">⚠️</span>
             <div>
-              <span className="font-semibold">เงื่อนไขใบกำกับภาษี: </span>
-              {taxEligibility.reasons.join(', ')} (กรุณากรอกและตั้งค่าในหมวดข้อมูลผู้ประกอบการ)
+              <span className="font-semibold">{t('taxRequirements')} </span>
+              {taxEligibility.reasons.join(', ')} {t('taxRequirementsSuffix')}
             </div>
           </div>
         )}
@@ -83,7 +78,7 @@ export function DocumentSection({ document, onSelectDocumentType, onUpdateHeader
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <label htmlFor="docNumber" className="mb-1 block text-xs font-medium text-slate-700">
-            เลขที่เอกสาร <span className="text-red-500">*</span>
+            {t('number')} <span className="text-red-500">*</span>
           </label>
           <input
             id="docNumber"
@@ -98,7 +93,7 @@ export function DocumentSection({ document, onSelectDocumentType, onUpdateHeader
 
         <div>
           <label htmlFor="issueDate" className="mb-1 block text-xs font-medium text-slate-700">
-            วันที่ออกเอกสาร <span className="text-red-500">*</span>
+            {t('issueDate')} <span className="text-red-500">*</span>
           </label>
           <input
             id="issueDate"
@@ -112,7 +107,7 @@ export function DocumentSection({ document, onSelectDocumentType, onUpdateHeader
 
         <div>
           <label htmlFor="dueDate" className="mb-1 block text-xs font-medium text-slate-700">
-            ครบกำหนดชำระ / ใช้ได้ถึง
+            {t('dueDate')}
           </label>
           <input
             id="dueDate"

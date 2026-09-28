@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import type { CalculationTotals } from '../../../domain/calculation/types';
 import type { AdjustmentConfig, DiscountConfig, DepositConfig, LineItem } from '../../../domain/document/types';
 import type { VatStatus } from '../../../domain/tax/types';
@@ -24,10 +25,14 @@ export function AdjustmentsSection({
   onToggleWhtBasisItem,
   isVisible,
 }: AdjustmentsSectionProps) {
+  const t = useTranslations('adjustments');
+  const section = useTranslations('section');
+  const locale = useLocale();
+  const money = (value: number) => new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-US', { style: 'currency', currency: 'THB' }).format(value);
   if (!isVisible) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-500 flex items-center justify-between">
-        <span>การปรับยอดและภาษี (ซ่อนอยู่ - ข้อมูลยังคงอยู่ในระบบ)</span>
+        <span>{section('hidden', { section: section('adjustments') })}</span>
       </div>
     );
   }
@@ -36,13 +41,13 @@ export function AdjustmentsSection({
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-      <h2 className="mb-4 text-base font-semibold text-slate-900">5. ส่วนลด ภาษี และเงินมัดจำ (Adjustments & Taxes)</h2>
+      <h2 className="mb-4 text-base font-semibold text-slate-900">{t('heading')}</h2>
 
       <div className="space-y-5">
         {/* 1. Document-Level Discount */}
         <div className="rounded-lg border border-slate-200 p-3.5 bg-slate-50/50">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-800">ส่วนลดท้ายเอกสาร (Document Discount)</span>
+            <span className="text-xs font-semibold text-slate-800">{t('discount')}</span>
           </div>
           <div className="flex gap-2">
             <select
@@ -59,9 +64,9 @@ export function AdjustmentsSection({
               }}
               className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 focus:border-indigo-500 focus:outline-none"
             >
-              <option value="none">ไม่มีส่วนลด</option>
-              <option value="percent">คิดเป็นเปอร์เซ็นต์ (%)</option>
-              <option value="fixed">ระบุจำนวนเงิน (บาท)</option>
+              <option value="none">{t('discountNone')}</option>
+              <option value="percent">{t('percent')}</option>
+              <option value="fixed">{t('amountThb')}</option>
             </select>
 
             {adjustments.documentDiscount.mode !== 'none' && (
@@ -91,10 +96,10 @@ export function AdjustmentsSection({
         <div className="rounded-lg border border-slate-200 p-3.5 bg-slate-50/50">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs font-semibold text-slate-800">ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
+              <span className="text-xs font-semibold text-slate-800">{t('vat')}</span>
               {!isVatRegistered && (
                 <p className="text-[11px] text-amber-700">
-                  ⚠️ ผู้ประกอบการยังไม่ได้เลือกสถานะจดทะเบียน VAT (ตั้งค่าในหมวดข้อมูลผู้ประกอบการ)
+                  ⚠️ {t('vatRequired')}
                 </p>
               )}
             </div>
@@ -123,8 +128,8 @@ export function AdjustmentsSection({
         <div className="rounded-lg border border-slate-200 p-3.5 bg-slate-50/50">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <span className="text-xs font-semibold text-slate-800">ภาษีหัก ณ ที่จ่าย (Withholding Tax - WHT)</span>
-              <p className="text-[11px] text-slate-500">เลือกรายการที่เข้าเกณฑ์หักภาษี ณ ที่จ่าย (เช่น ค่าบริการ)</p>
+              <span className="text-xs font-semibold text-slate-800">{t('wht')}</span>
+              <p className="text-[11px] text-slate-500">{t('whtHint')}</p>
             </div>
 
             <button
@@ -155,7 +160,7 @@ export function AdjustmentsSection({
           {adjustments.wht.enabled && (
             <div className="space-y-3 border-t border-slate-200 pt-3">
               <div className="flex items-center gap-3">
-                <label className="text-xs font-medium text-slate-700">อัตราหัก ณ ที่จ่าย (%):</label>
+                <label className="text-xs font-medium text-slate-700">{t('whtRate')}</label>
                 <input
                   type="number"
                   min={0}
@@ -174,12 +179,12 @@ export function AdjustmentsSection({
                   }}
                   className="w-24 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm font-mono text-slate-900 focus:border-indigo-500 focus:outline-none"
                 />
-                <span className="text-xs text-slate-500">(เช่น บริการทั่วไป 3%, ค่าเช่า 5%, ค่าขนส่ง 1%)</span>
+                <span className="text-xs text-slate-500">{t('whtExamples')}</span>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-slate-700">
-                  เลือกรายการที่ต้องหัก ณ ที่จ่าย (WHT Basis Lines):
+                  {t('whtLines')}
                 </label>
                 <div className="space-y-1.5">
                   {items.map((item, idx) => {
@@ -199,7 +204,7 @@ export function AdjustmentsSection({
                           className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                         />
                         <span className="font-mono text-slate-500">#{idx + 1}</span>
-                        <span className="truncate">{item.description || '(ยังไม่ระบุชื่อรายการ)'}</span>
+                        <span className="truncate">{item.description || t('unnamedItem')}</span>
                       </label>
                     );
                   })}
@@ -212,7 +217,7 @@ export function AdjustmentsSection({
         {/* 4. Deposit Configuration */}
         <div className="rounded-lg border border-slate-200 p-3.5 bg-slate-50/50">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-800">เงินมัดจำ / เงินชำระล่วงหน้า (Deposit)</span>
+            <span className="text-xs font-semibold text-slate-800">{t('deposit')}</span>
           </div>
           <div className="flex gap-2">
             <select
@@ -229,9 +234,9 @@ export function AdjustmentsSection({
               }}
               className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 focus:border-indigo-500 focus:outline-none"
             >
-              <option value="none">ไม่มีเงินมัดจำ</option>
-              <option value="percent">คิดเป็นเปอร์เซ็นต์ (%) ของยอดสุทธิ</option>
-              <option value="fixed">ระบุจำนวนเงิน (บาท)</option>
+              <option value="none">{t('depositNone')}</option>
+              <option value="percent">{t('depositPercent')}</option>
+              <option value="fixed">{t('amountThb')}</option>
             </select>
 
             {adjustments.deposit.mode !== 'none' && (
@@ -261,55 +266,55 @@ export function AdjustmentsSection({
         {totals && (
           <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4">
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-indigo-900">
-              สรุปยอดคำนวณสด (Live Calculation Summary)
+              {t('summary')}
             </h3>
             <div className="space-y-1.5 text-xs">
               <div className="flex justify-between text-slate-600">
-                <span>รวมเป็นเงิน (Subtotal):</span>
+                <span>{t('subtotal')}</span>
                 <span className="font-mono font-semibold" data-testid="summary-subtotal">
-                  {totals.subtotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿
+                  {money(totals.subtotal)}
                 </span>
               </div>
 
               {totals.documentDiscountAmount > 0 && (
                 <div className="flex justify-between text-emerald-700">
-                  <span>ส่วนลดท้ายเอกสาร:</span>
+                  <span>{t('docDiscount')}</span>
                   <span className="font-mono font-semibold" data-testid="summary-doc-discount">
-                    -{totals.documentDiscountAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿
+                    -{money(totals.documentDiscountAmount)}
                   </span>
                 </div>
               )}
 
               {totals.vatAmount > 0 && (
                 <div className="flex justify-between text-slate-600">
-                  <span>ภาษีมูลค่าเพิ่ม VAT 7%:</span>
+                  <span>{t('vatAmount')}</span>
                   <span className="font-mono font-semibold" data-testid="summary-vat-amount">
-                    +{totals.vatAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿
+                    +{money(totals.vatAmount)}
                   </span>
                 </div>
               )}
 
               {totals.whtAmount > 0 && (
                 <div className="flex justify-between text-amber-800">
-                  <span>หักภาษี ณ ที่จ่าย (ฐาน {totals.whtBasisAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿ @ {totals.whtRatePercent}%):</span>
+                  <span>{t('withholding', { amount: money(totals.whtBasisAmount), rate: totals.whtRatePercent })}</span>
                   <span className="font-mono font-semibold" data-testid="summary-wht-amount">
-                    -{totals.whtAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿
+                    -{money(totals.whtAmount)}
                   </span>
                 </div>
               )}
 
               <div className="my-2 border-t border-indigo-200/80 pt-2 flex justify-between text-sm font-bold text-slate-900">
-                <span>ยอดชำระสุทธิ (Net Payable):</span>
+                <span>{t('netPayable')}</span>
                 <span className="font-mono text-base text-indigo-700" data-testid="summary-net-payable">
-                  {totals.netPayable.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿
+                  {money(totals.netPayable)}
                 </span>
               </div>
 
               {totals.depositAmount > 0 && (
                 <div className="flex justify-between text-slate-600 border-t border-dashed border-indigo-200 pt-1.5">
-                  <span>เงินมัดจำที่ต้องชำระ:</span>
+                  <span>{t('depositAmount')}</span>
                   <span className="font-mono font-semibold text-indigo-900" data-testid="summary-deposit-amount">
-                    {totals.depositAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿
+                    {money(totals.depositAmount)}
                   </span>
                 </div>
               )}
