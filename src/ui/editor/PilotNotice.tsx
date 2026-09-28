@@ -1,9 +1,14 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 export function PilotNotice() {
+  const t = useTranslations('pilot');
   return (
     <section
       data-testid="public-pilot-notice"
       className="no-print border-b border-amber-200 bg-amber-50/90 px-3 py-2.5 text-slate-800 sm:px-6"
-      aria-label="ข้อมูล Public Pilot"
+      aria-label={t('aria')}
     >
       <div className="mx-auto max-w-7xl">
         <details className="group">
@@ -11,39 +16,37 @@ export function PilotNotice() {
             <span className="mr-2 rounded-full bg-amber-200 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-amber-950">
               Public Pilot
             </span>
-            ข้อมูลเก็บในเบราว์เซอร์เครื่องนี้ — ยังไม่มี Cloud Backup
-            <span className="ml-1 text-amber-800 group-open:hidden">ดูข้อควรรู้</span>
+            {t('summary')}
+            <span className="ml-1 text-amber-800 group-open:hidden">{t('details')}</span>
           </summary>
 
           <div className="mt-3 grid gap-3 text-xs leading-relaxed text-slate-700 md:grid-cols-2">
             <div>
-              <h2 className="font-bold text-slate-900">ข้อมูลและความเป็นส่วนตัว</h2>
+              <h2 className="font-bold text-slate-900">{t('privacy')}</h2>
               <ul className="mt-1 list-disc space-y-1 pl-5">
-                <li>เอกสารและรูปที่เพิ่มจะเก็บใน Browser Storage ของอุปกรณ์นี้เท่านั้น</li>
-                <li>หากล้างข้อมูลเว็บไซต์ เปลี่ยนเบราว์เซอร์ หรือเครื่องเสีย ข้อมูลอาจสูญหายได้</li>
-                <li>ตัวแอป DocCraft รอบนี้ไม่ส่ง analytics/telemetry หรือเนื้อหาเอกสารไปยังระบบวิเคราะห์ภายนอก</li>
-                <li>ผู้ให้บริการโฮสติ้ง/เครือข่ายอาจมี operational logs ตามการทำงานของบริการ โดยไม่ใช่ telemetry ที่ตัวแอป DocCraft ส่งเอง</li>
+                <li>{t('dataStored')}</li>
+                <li>{t('dataLoss')}</li>
+                <li>{t('noTelemetry')}</li>
+                <li>{t('operationalLogs')}</li>
               </ul>
             </div>
             <div>
-              <h2 className="font-bold text-slate-900">ข้อจำกัดของ Pilot</h2>
+              <h2 className="font-bold text-slate-900">{t('pilotLimits')}</h2>
               <ul className="mt-1 list-disc space-y-1 pl-5">
-                <li>PromptPay QR เป็นคำสั่งชำระเงินบนเอกสาร ไม่ได้ยืนยันว่าได้รับเงินจริงแล้ว</li>
-                <li>ผลการพิมพ์อาจต่างกันเล็กน้อยตาม Browser, OS และเครื่องพิมพ์</li>
-                <li>DocCraft ไม่ใช่ระบบบัญชีหรือคำปรึกษาด้านภาษี โปรดตรวจเอกสารสำคัญก่อนใช้งานจริง</li>
+                <li>{t('promptPay')}</li>
+                <li>{t('printing')}</li>
+                <li>{t('notAdvice')}</li>
               </ul>
             </div>
 
             <p className="md:col-span-2">
-              แจ้งปัญหา Public Pilot แบบ best-effort (ไม่มี SLA):{' '}
-              <a
-                href="https://github.com/Gutumrod/doccraft/issues"
-                target="_blank"
-                rel="noreferrer"
-                className="font-semibold text-indigo-700 underline underline-offset-2 hover:text-indigo-900"
-              >
+              {t('support')}{' '}
+              <a href="https://github.com/Gutumrod/doccraft/issues" target="_blank" rel="noreferrer" className="font-semibold text-indigo-700 underline underline-offset-2 hover:text-indigo-900">
                 DocCraft GitHub Issues
               </a>
+            </p>
+            <p data-testid="legal-translation-status" className="md:col-span-2 text-slate-500">
+              {t('termsUnavailable')}
             </p>
           </div>
         </details>

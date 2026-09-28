@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { NextIntlClientProvider, useLocale, useTranslations } from 'next-intl';
+import { LanguageToggle } from '../../components/LanguageToggle';
+import { localeMessages, type Locale } from '../../i18n/locale-provider';
 import { calculateDocument } from '../../domain/calculation/calculate';
 import type { DocCraftDocument } from '../../domain/document/types';
 import { resolvePromptPay } from '../../domain/promptpay/resolve';
@@ -46,7 +49,12 @@ import { ItemsSection } from './sections/ItemsSection';
 import { PaymentSection } from './sections/PaymentSection';
 import { TermsNotesSection } from './sections/TermsNotesSection';
 
+const DOCUMENT_LOCALE_KEY = 'doccraft_document_locale';
+
 export function DocCraftEditor() {
+  const t = useTranslations('app');
+  const locale = useLocale();
+  const [documentLocale, setDocumentLocale] = useState<Locale>('th');
   const [doc, setDoc] = useState<DocCraftDocument>(() => createInitialDocument());
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [storageStatus, setStorageStatus] = useState<StorageStatus>('saved');
@@ -58,6 +66,7 @@ export function DocCraftEditor() {
   // Pure calculation result derived from domain rules on every render
   const calcResult = calculateDocument(doc);
   const totals = calcResult.ok ? calcResult.value : undefined;
+  const formattedNetTotal = totals ? new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-US', { style: 'currency', currency: 'THB' }).format(totals.netPayable) : null;
   const promptPayActive = doc.blocks.payment && doc.payment.promptPay.enabled;
   const promptPayResult = calcResult.ok && promptPayActive
     ? resolvePromptPay(doc.payment.promptPay, calcResult.value)
@@ -77,11 +86,20 @@ export function DocCraftEditor() {
           setStorageStatus('saved');
         }
       } else {
-        setStorageNotice(`⚠️ ไม่สามารถกู้คืนข้อมูลเดิมได้: ${loadResult.error.message}`);
+        setStorageNotice(t('storageRestoreFailed', { message: t(`persistenceErrors.${loadResult.error.code}`) }));
         setStorageStatus('error');
       }
       isInitialized.current = true;
     });
+  }, [t]);
+
+  useEffect(() => {
+    try {
+      const savedLocale = window.localStorage.getItem(DOCUMENT_LOCALE_KEY);
+      if (savedLocale === 'th' || savedLocale === 'en') queueMicrotask(() => setDocumentLocale(savedLocale));
+    } catch {
+      // Keep Thai as the safe default when browser storage is unavailable.
+    }
   }, []);
 
   // Autosave effect with debounce when document state updates (after mount initialization)
@@ -96,13 +114,13 @@ export function DocCraftEditor() {
       } else {
         setStorageStatus('error');
         setStorageNotice(
-          '⚠️ ไม่สามารถบันทึกข้อมูลลงในเบราว์เซอร์ได้ (พื้นที่เต็มหรือเบราว์เซอร์บล็อก LocalStorage) - คุณยังสามารถแก้ไขและ Export JSON ได้'
+          t('storageSaveFailed')
         );
       }
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [doc]);
+  }, [doc, t]);
 
   const handlePrint = () => {
     // Fail-closed protection: never invoke native print for invalid documents
@@ -129,7 +147,7 @@ export function DocCraftEditor() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size <= 0 || file.size > MAX_IMPORT_JSON_BYTES) {
-      setImportError('⚠️ นำเข้าไฟล์ไม่สำเร็จ: ไฟล์ JSON ต้องมีขนาดมากกว่า 0 และไม่เกิน 16 MiB');
+      setImportError(t('importInvalidSize'));
       return;
     }
 
@@ -144,11 +162,11 @@ export function DocCraftEditor() {
         saveDraft(importResult.value);
         setImportError(null);
       } else {
-        setImportError(`⚠️ นำเข้าไฟล์ไม่สำเร็จ: ${importResult.error.message}`);
+        setImportError(t('importFailed', { message: t(`persistenceErrors.${importResult.error.code}`) }));
       }
     };
     reader.onerror = () => {
-      setImportError('⚠️ ไม่สามารถอ่านไฟล์ที่เลือกได้');
+      setImportError(t('importReadFailed'));
     };
     reader.readAsText(file);
   };
@@ -199,7 +217,7 @@ export function DocCraftEditor() {
                     data-testid="status-autosave-saved"
                     className="hidden md:inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 border border-emerald-200"
                   >
-                    ✓ บันทึกอัตโนมัติแล้ว
+                    {t('saved')}
                   </span>
                 )}
                 {storageStatus === 'error' && (
@@ -207,19 +225,20 @@ export function DocCraftEditor() {
                     data-testid="status-autosave-error"
                     className="hidden md:inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200"
                   >
-                    ⚠️ บันทึกไม่สำเร็จ
+                    {t('saveFailed')}
                   </span>
                 )}
               </div>
-              <p className="hidden md:block text-[11px] text-slate-500 truncate">ระบบสร้างเอกสารธุรกิจแบบโมดูลาร์ พร้อมพิมพ์เอกสาร A4</p>
+              <p className="hidden md:block text-[11px] text-slate-500 truncate">{t('subtitle')}</p>
             </div>
           </div>
 
           {/* Header Action Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <LanguageToggle />
             {/* Fixture Selector (Useful for quick validation & demonstrations) */}
             <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-500 border-r border-slate-200 pr-2">
-              <span className="text-[11px]">ตัวอย่าง:</span>
+              <span className="text-[11px]">{t('fixtureLabel')}</span>
               <select
                 data-testid="select-fixture"
                 onChange={(e) => {
@@ -234,13 +253,13 @@ export function DocCraftEditor() {
                 }}
                 className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="default">เอกสารเริ่มต้น (Default)</option>
-                <option value="one-page">1 หน้า (One-Page Quotation)</option>
-                <option value="multi-page">2+ หน้า (Multi-Page Invoice)</option>
-                <option value="thai-text">ข้อความไทย (Rich Thai Receipt)</option>
-                <option value="long-customer">ข้อความยาว (Long Customer / Tax Invoice)</option>
-                <option value="with-images">มีรูปภาพ (With Item Images)</option>
-                <option value="minimal">บล็อกขั้นต่ำ (Minimal Blocks)</option>
+                <option value="default">{t('fixtures.default')}</option>
+                <option value="one-page">{t('fixtures.onePage')}</option>
+                <option value="multi-page">{t('fixtures.multiPage')}</option>
+                <option value="thai-text">{t('fixtures.thai')}</option>
+                <option value="long-customer">{t('fixtures.long')}</option>
+                <option value="with-images">{t('fixtures.images')}</option>
+                <option value="minimal">{t('fixtures.minimal')}</option>
               </select>
             </div>
 
@@ -249,11 +268,11 @@ export function DocCraftEditor() {
               type="button"
               data-testid="btn-new-document"
               onClick={handleNewDocument}
-              title="สร้างเอกสารใหม่และรีเซ็ตข้อมูล"
+              title={t('newDocument')}
               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs font-semibold text-slate-700 shadow-2xs transition-all active:scale-95"
             >
               <span>📄</span>
-              <span className="hidden sm:inline">สร้างใหม่</span>
+              <span className="hidden sm:inline">{t('new')}</span>
             </button>
 
             <button
@@ -261,11 +280,11 @@ export function DocCraftEditor() {
               type="button"
               data-testid="btn-import-json"
               onClick={handleImportClick}
-              title="นำเข้าเอกสารจากไฟล์ JSON สำรอง"
+              title={t('importTitle')}
               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs font-semibold text-slate-700 shadow-2xs transition-all active:scale-95"
             >
               <span>📥</span>
-              <span className="hidden sm:inline">นำเข้า JSON</span>
+              <span className="hidden sm:inline">{t('import')}</span>
             </button>
 
             <button
@@ -273,11 +292,11 @@ export function DocCraftEditor() {
               type="button"
               data-testid="btn-export-json"
               onClick={handleExport}
-              title="ส่งออกเอกสารเป็นไฟล์ JSON เพื่อสำรองข้อมูล"
+              title={t('exportTitle')}
               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs font-semibold text-slate-700 shadow-2xs transition-all active:scale-95"
             >
               <span>📤</span>
-              <span className="hidden sm:inline">ส่งออก JSON</span>
+              <span className="hidden sm:inline">{t('export')}</span>
             </button>
 
             {/* Compact View Tab Switcher (<1024px) */}
@@ -292,7 +311,7 @@ export function DocCraftEditor() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                ✏️ แก้ไข
+                ✏️ {t('edit')}
               </button>
               <button
                 type="button"
@@ -304,7 +323,7 @@ export function DocCraftEditor() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                👁️ ตัวอย่าง
+                👁️ {t('preview')}
               </button>
             </div>
 
@@ -314,7 +333,7 @@ export function DocCraftEditor() {
               data-testid="btn-print-document"
               onClick={handlePrint}
               disabled={!isValid}
-              title={!isValid ? 'กรุณาแก้ไขข้อผิดพลาดในเอกสารก่อนพิมพ์' : 'พิมพ์เอกสาร A4'}
+              title={!isValid ? t('printInvalid') : t('printA4')}
               className={`hidden lg:inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold shadow-sm transition-all ${
                 isValid
                   ? 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95'
@@ -322,15 +341,15 @@ export function DocCraftEditor() {
               }`}
             >
               <span>🖨️</span>
-              <span>พิมพ์เอกสาร A4</span>
+              <span>{t('printA4')}</span>
             </button>
 
             {/* Desktop Summary Badge */}
             <div className="hidden 2xl:flex items-center gap-4 text-xs font-medium border-l border-slate-200 pl-3">
               <div className="text-right">
-                <span className="block text-[11px] text-slate-500">ยอดชำระสุทธิ (Net Total)</span>
+                <span className="block text-[11px] text-slate-500">{t('netTotal')}</span>
                 <span className="font-mono text-sm font-bold text-indigo-700" data-testid="header-net-payable">
-                  {totals ? `${totals.netPayable.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿` : 'ข้อผิดพลาด'}
+                  {formattedNetTotal ?? t('error')}
                 </span>
               </div>
             </div>
@@ -354,7 +373,7 @@ export function DocCraftEditor() {
               onClick={() => setStorageNotice(null)}
               className="text-amber-700 hover:text-amber-900 font-bold ml-2 text-xs"
             >
-              ✕ ปิด
+              ✕ {t('close')}
             </button>
           </div>
         )}
@@ -371,7 +390,7 @@ export function DocCraftEditor() {
               onClick={() => setImportError(null)}
               className="text-rose-700 hover:text-rose-900 font-bold ml-2 text-xs"
             >
-              ✕ ปิด
+              ✕ {t('close')}
             </button>
           </div>
         )}
@@ -383,7 +402,7 @@ export function DocCraftEditor() {
             className="no-print global-validation-alert mb-6 rounded-xl border border-rose-300 bg-rose-50 p-4 text-xs text-rose-900 shadow-xs"
           >
             <div className="flex items-center gap-2 font-bold text-rose-800 mb-1.5">
-              <span>⚠️</span> ข้อมูลในเอกสารยังไม่สมบูรณ์ ({errors.length} รายการ):
+              <span>⚠️</span> {t('incomplete', { count: errors.length })}
             </div>
             <ul className="list-disc pl-5 space-y-1 text-rose-700">
               {errors.map((err, i) => (
@@ -480,23 +499,48 @@ export function DocCraftEditor() {
           >
             <div className="sticky top-20">
               <div className="no-print mb-2 flex items-center justify-between text-xs font-semibold text-slate-500 px-1">
-                <span>👁️ แสดงตัวอย่างเอกสาร A4 (Live Preview)</span>
-                <button
+                <span>👁️ {t('livePreview')}</span>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1">
+                    <span>{t('documentLanguage')}</span>
+                    <select
+                      data-testid="document-language-select"
+                      aria-label={t('documentLanguage')}
+                      value={documentLocale}
+                      onChange={(event) => {
+                        const nextLocale = event.target.value as Locale;
+                        setDocumentLocale(nextLocale);
+                        try {
+                          window.localStorage.setItem(DOCUMENT_LOCALE_KEY, nextLocale);
+                        } catch {
+                          // The selection remains active for this session.
+                        }
+                      }}
+                      className="rounded border border-slate-300 bg-white px-1 py-0.5 text-slate-700"
+                    >
+                      <option value="th">{t('documentLanguageThai')}</option>
+                      <option value="en">{t('documentLanguageEnglish')}</option>
+                    </select>
+                  </label>
+                  <button
                   type="button"
                   data-testid="btn-preview-print"
                   onClick={handlePrint}
                   disabled={!isValid}
-                  title={!isValid ? 'กรุณาแก้ไขข้อผิดพลาดในเอกสารก่อนพิมพ์' : 'พิมพ์เอกสาร'}
+                  title={!isValid ? t('printInvalid') : t('print')}
                   className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-bold transition-colors ${
                     isValid
                       ? 'bg-slate-200 hover:bg-slate-300 text-slate-800'
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60'
                   }`}
                 >
-                  <span>🖨️ พิมพ์ (Print)</span>
-                </button>
+                  <span>🖨️ {t('print')}</span>
+                  </button>
+                </div>
               </div>
-              <DocumentPreview document={doc} totals={totals} errors={errors} promptPay={resolvedPromptPay} />
+              <NextIntlClientProvider locale={documentLocale} messages={localeMessages[documentLocale]}>
+                <DocumentPreview document={doc} outputLocale={documentLocale} totals={totals} errors={errors} promptPay={resolvedPromptPay} />
+              </NextIntlClientProvider>
             </div>
           </div>
         </div>
@@ -505,9 +549,9 @@ export function DocCraftEditor() {
       {/* Mobile Bottom Sticky Bar for compact view (<1024px, Hidden in print) */}
       <div className="no-print mobile-bottom-bar fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur-sm p-3 lg:hidden flex items-center justify-between shadow-lg">
         <div>
-          <span className="block text-[10px] uppercase font-bold text-slate-500">ยอดชำระสุทธิ</span>
+          <span className="block text-[10px] uppercase font-bold text-slate-500">{t('mobileNetTotal')}</span>
           <span className="font-mono text-sm font-black text-indigo-700" data-testid="mobile-net-payable">
-            {totals ? `${totals.netPayable.toLocaleString('th-TH', { minimumFractionDigits: 2 })} ฿` : 'กรุณาแก้ไขข้อผิดพลาด'}
+            {formattedNetTotal ?? t('printInvalid')}
           </span>
         </div>
 
@@ -519,28 +563,28 @@ export function DocCraftEditor() {
             onClick={handleExport}
             className="rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2.5 py-2 text-xs font-bold text-slate-800 shadow-2xs active:scale-95 transition-all"
           >
-            📤 ส่งออก
+            📤 {t('exportShort')}
           </button>
           <button
             type="button"
             data-testid="btn-mobile-print"
             onClick={handlePrint}
             disabled={!isValid}
-            title={!isValid ? 'กรุณาแก้ไขข้อผิดพลาดในเอกสารก่อนพิมพ์' : 'พิมพ์เอกสาร'}
+            title={!isValid ? t('printInvalid') : t('print')}
             className={`rounded-lg px-3 py-2 text-xs font-bold shadow-sm transition-all ${
               isValid
                 ? 'bg-slate-800 text-white hover:bg-slate-900 active:scale-95'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-60'
             }`}
           >
-            🖨️ พิมพ์
+            🖨️ {t('print')}
           </button>
           <button
             type="button"
             onClick={() => setActiveTab((t) => (t === 'editor' ? 'preview' : 'editor'))}
             className="rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-700 active:scale-95 transition-all"
           >
-            {activeTab === 'editor' ? 'ดูตัวอย่าง 👁️' : 'แก้ไข ✏️'}
+            {activeTab === 'editor' ? t('editPreviewToggle') : t('editEditorToggle')}
           </button>
         </div>
       </div>
